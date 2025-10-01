@@ -23,7 +23,7 @@ This checklist breaks down each ticket into tiny, testable tasks following Test-
 - [x] JJM-001-T06: Create `jules_job_manager/docs/` directory
 - [x] JJM-001-T07: Create `jules_job_manager/src/__init__.py`
 - [x] JJM-001-T08: Create `jules_job_manager/tests/__init__.py`
-- [ ] JJM-001-T09: Create `jules_job_manager/requirements.txt` with initial dependencies
+- [x] JJM-001-T09: Create `jules_job_manager/requirements.txt` with initial dependencies
 - [ ] JJM-001-T10: Create `jules_job_manager/setup.py` with package metadata
 - [ ] JJM-001-T11: Create `jules_job_manager/.gitignore` (if not exists)
 - [ ] JJM-001-T12: Create `jules_job_manager/README.md` with basic info
