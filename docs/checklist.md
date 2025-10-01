@@ -41,35 +41,35 @@ This checklist breaks down each ticket into tiny, testable tasks following Test-
 #### JJM-002: Data Models Implementation
 **TDD: Write tests first, then implement models**
 
-- [ ] JJM-002-T01: Create `jules_job_manager/tests/test_models.py`
-- [ ] JJM-002-T02: Write test for `TaskStatus` enum creation
-- [ ] JJM-002-T03: Write test for `TaskStatus` enum values (pending, in_progress, completed, paused, failed)
-- [ ] JJM-002-T04: Write test for `ChatMessage` dataclass initialization
-- [ ] JJM-002-T05: Write test for `ChatMessage` with all fields (role, content, timestamp)
-- [ ] JJM-002-T06: Write test for `ChatMessage` default timestamp
-- [ ] JJM-002-T07: Write test for `SourceFile` dataclass initialization
-- [ ] JJM-002-T08: Write test for `SourceFile` with all fields (path, status, diff)
-- [ ] JJM-002-T09: Write test for `JulesTask` dataclass initialization
-- [ ] JJM-002-T10: Write test for `JulesTask` with all required fields
-- [ ] JJM-002-T11: Write test for `JulesTask` with optional fields (chat_history, source_files)
-- [ ] JJM-002-T12: Write test for `JulesTask.to_dict()` method
-- [ ] JJM-002-T13: Write test for `JulesTask.from_dict()` method
-- [ ] JJM-002-T14: Write test for nested serialization (ChatMessage, SourceFile in JulesTask)
-- [ ] JJM-002-T15: Run tests (should fail - Red phase): `pytest tests/test_models.py -v`
-- [ ] JJM-002-T16: Create `jules_job_manager/src/models.py`
-- [ ] JJM-002-T17: Implement `TaskStatus` enum with all values
-- [ ] JJM-002-T18: Implement `ChatMessage` dataclass with type hints
-- [ ] JJM-002-T19: Implement `ChatMessage` with default timestamp using `datetime.now()`
-- [ ] JJM-002-T20: Implement `SourceFile` dataclass with type hints
-- [ ] JJM-002-T21: Implement `JulesTask` dataclass with all fields
-- [ ] JJM-002-T22: Implement `JulesTask.to_dict()` method
-- [ ] JJM-002-T23: Implement `JulesTask.from_dict()` class method
-- [ ] JJM-002-T24: Handle nested object serialization in to_dict/from_dict
-- [ ] JJM-002-T25: Run tests (should pass - Green phase): `pytest tests/test_models.py -v`
-- [ ] JJM-002-T26: Add docstrings to all classes and methods
-- [ ] JJM-002-T27: Add type hints validation
-- [ ] JJM-002-T28: Run tests again to verify refactoring
-- [ ] JJM-002-T29: Check code coverage: `pytest tests/test_models.py --cov=src.models`
+- [x] JJM-002-T01: Create `jules_job_manager/tests/test_models.py`
+- [x] JJM-002-T02: Write test for `TaskStatus` enum creation
+- [x] JJM-002-T03: Write test for `TaskStatus` enum values (pending, in_progress, completed, paused, failed)
+- [x] JJM-002-T04: Write test for `ChatMessage` dataclass initialization
+- [x] JJM-002-T05: Write test for `ChatMessage` with all fields (role, content, timestamp)
+- [x] JJM-002-T06: Write test for `ChatMessage` default timestamp
+- [x] JJM-002-T07: Write test for `SourceFile` dataclass initialization
+- [x] JJM-002-T08: Write test for `SourceFile` with all fields (path, status, diff)
+- [x] JJM-002-T09: Write test for `JulesTask` dataclass initialization
+- [x] JJM-002-T10: Write test for `JulesTask` with all required fields
+- [x] JJM-002-T11: Write test for `JulesTask` with optional fields (chat_history, source_files)
+- [x] JJM-002-T12: Write test for `JulesTask.to_dict()` method
+- [x] JJM-002-T13: Write test for `JulesTask.from_dict()` method
+- [x] JJM-002-T14: Write test for nested serialization (ChatMessage, SourceFile in JulesTask)
+- [x] JJM-002-T15: Run tests (should fail - Red phase): `pytest tests/test_models.py -v`
+- [x] JJM-002-T16: Create `jules_job_manager/src/models.py`
+- [x] JJM-002-T17: Implement `TaskStatus` enum with all values
+- [x] JJM-002-T18: Implement `ChatMessage` dataclass with type hints
+- [x] JJM-002-T19: Implement `ChatMessage` with default timestamp using `datetime.now()`
+- [x] JJM-002-T20: Implement `SourceFile` dataclass with type hints
+- [x] JJM-002-T21: Implement `JulesTask` dataclass with all fields
+- [x] JJM-002-T22: Implement `JulesTask.to_dict()` method
+- [x] JJM-002-T23: Implement `JulesTask.from_dict()` class method
+- [x] JJM-002-T24: Handle nested object serialization in to_dict/from_dict
+- [x] JJM-002-T25: Run tests (should pass - Green phase): `pytest tests/test_models.py -v`
+- [x] JJM-002-T26: Add docstrings to all classes and methods
+- [x] JJM-002-T27: Add type hints validation
+- [x] JJM-002-T28: Run tests again to verify refactoring
+- [x] JJM-002-T29: Check code coverage: `pytest tests/test_models.py --cov=src.models`
 - [ ] JJM-002-T30: Commit changes: "JJM-002: Implement data models with tests"
 - [ ] JJM-002-T31: Push to repository
 
