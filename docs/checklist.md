@@ -70,42 +70,42 @@ This checklist breaks down each ticket into tiny, testable tasks following Test-
 - [x] JJM-002-T27: Add type hints validation
 - [x] JJM-002-T28: Run tests again to verify refactoring
 - [x] JJM-002-T29: Check code coverage: `pytest tests/test_models.py --cov=src.models`
-- [ ] JJM-002-T30: Commit changes: "JJM-002: Implement data models with tests"
-- [ ] JJM-002-T31: Push to repository
+- [x] JJM-002-T30: Commit changes: "JJM-002: Implement data models with tests"
+- [x] JJM-002-T31: Push to repository
 
 ---
 
 #### JJM-003: MCP Client Foundation
 **TDD: Write tests for MCP client initialization and lifecycle**
 
-- [ ] JJM-003-T01: Create `jules_job_manager/tests/test_mcp_client.py`
-- [ ] JJM-003-T02: Write test for `MCPClient.__init__()` with config
-- [ ] JJM-003-T03: Write test for `MCPClient.start()` method
-- [ ] JJM-003-T04: Write test for subprocess creation in start()
-- [ ] JJM-003-T05: Write test for stdin/stdout pipe setup
-- [ ] JJM-003-T06: Write test for `MCPClient.stop()` method
-- [ ] JJM-003-T07: Write test for process termination in stop()
-- [ ] JJM-003-T08: Write test for context manager `__enter__()` method
-- [ ] JJM-003-T09: Write test for context manager `__exit__()` method
-- [ ] JJM-003-T10: Write test for automatic cleanup on exit
-- [ ] JJM-003-T11: Write test for connection error handling
-- [ ] JJM-003-T12: Write test for timeout handling
-- [ ] JJM-003-T13: Run tests (should fail - Red phase): `pytest tests/test_mcp_client.py -v`
-- [ ] JJM-003-T14: Create `jules_job_manager/src/mcp_client.py`
-- [ ] JJM-003-T15: Implement `MCPClient` class with __init__
-- [ ] JJM-003-T16: Implement config loading in __init__
-- [ ] JJM-003-T17: Implement `start()` method with subprocess.Popen
-- [ ] JJM-003-T18: Set up stdin=PIPE, stdout=PIPE in Popen
-- [ ] JJM-003-T19: Implement `stop()` method with process.terminate()
-- [ ] JJM-003-T20: Add process.wait() with timeout in stop()
-- [ ] JJM-003-T21: Implement `__enter__()` method calling start()
-- [ ] JJM-003-T22: Implement `__exit__()` method calling stop()
-- [ ] JJM-003-T23: Add error handling for subprocess failures
-- [ ] JJM-003-T24: Add timeout handling for process operations
-- [ ] JJM-003-T25: Run tests (should pass - Green phase): `pytest tests/test_mcp_client.py -v`
-- [ ] JJM-003-T26: Add logging for start/stop operations
-- [ ] JJM-003-T27: Add docstrings to all methods
-- [ ] JJM-003-T28: Run tests again to verify refactoring
+- [x] JJM-003-T01: Create `jules_job_manager/tests/test_mcp_client.py`
+- [x] JJM-003-T02: Write test for `MCPClient.__init__()` with config
+- [x] JJM-003-T03: Write test for `MCPClient.start()` method
+- [x] JJM-003-T04: Write test for subprocess creation in start()
+- [x] JJM-003-T05: Write test for stdin/stdout pipe setup
+- [x] JJM-003-T06: Write test for `MCPClient.stop()` method
+- [x] JJM-003-T07: Write test for process termination in stop()
+- [x] JJM-003-T08: Write test for context manager `__enter__()` method
+- [x] JJM-003-T09: Write test for context manager `__exit__()` method
+- [x] JJM-003-T10: Write test for automatic cleanup on exit
+- [x] JJM-003-T11: Write test for connection error handling
+- [x] JJM-003-T12: Write test for timeout handling
+- [x] JJM-003-T13: Run tests (should fail - Red phase): `pytest tests/test_mcp_client.py -v`
+- [x] JJM-003-T14: Create `jules_job_manager/src/mcp_client.py`
+- [x] JJM-003-T15: Implement `MCPClient` class with __init__
+- [x] JJM-003-T16: Implement config loading in __init__
+- [x] JJM-003-T17: Implement `start()` method with subprocess.Popen
+- [x] JJM-003-T18: Set up stdin=PIPE, stdout=PIPE in Popen
+- [x] JJM-003-T19: Implement `stop()` method with process.terminate()
+- [x] JJM-003-T20: Add process.wait() with timeout in stop()
+- [x] JJM-003-T21: Implement `__enter__()` method calling start()
+- [x] JJM-003-T22: Implement `__exit__()` method calling stop()
+- [x] JJM-003-T23: Add error handling for subprocess failures
+- [x] JJM-003-T24: Add timeout handling for process operations
+- [x] JJM-003-T25: Run tests (should pass - Green phase): `pytest tests/test_mcp_client.py -v`
+- [x] JJM-003-T26: Add logging for start/stop operations
+- [x] JJM-003-T27: Add docstrings to all methods
+- [x] JJM-003-T28: Run tests again to verify refactoring
 - [ ] JJM-003-T29: Check code coverage: `pytest tests/test_mcp_client.py --cov=src.mcp_client`
 - [ ] JJM-003-T30: Commit changes: "JJM-003: Implement MCP client foundation with tests"
 - [ ] JJM-003-T31: Push to repository
