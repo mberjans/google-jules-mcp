@@ -1,5 +1,4 @@
 from contextlib import contextmanager
-from datetime import timedelta
 from typing import Any, Dict
 
 import pytest
@@ -146,3 +145,117 @@ def test_create_client_validates_config():
 
     client = mcp_client.create_client({"path": "server.js", "node_path": "node"})
     assert client["timeout"] == pytest.approx(5.0)
+
+
+def test_generate_request_id_unique():
+    generator = mcp_client.create_request_id_generator()
+    first = generator()
+    second = generator()
+    assert isinstance(first, str)
+    assert isinstance(second, str)
+    assert first != second
+
+
+def test_build_request_structure(monkeypatch):
+    client = mcp_client.create_client({"path": "server.js", "node_path": "node"})
+    generator = mcp_client.create_request_id_generator()
+    monkeypatch.setattr(mcp_client, "create_request_id_generator", lambda: generator)
+    request = mcp_client.build_json_rpc_request("tools/list", {"key": "value"}, generator)
+    assert request["jsonrpc"] == "2.0"
+    assert request["method"] == "tools/list"
+    assert request["params"] == {"key": "value"}
+    assert request["id"] == "1"
+
+
+def test_send_request_writes_json(monkeypatch):
+    captured = {}
+
+    class StubProcess:
+        def __init__(self) -> None:
+            self.stdin = self
+
+        def write(self, value: str) -> None:
+            captured.setdefault("writes", []).append(value)
+
+        def flush(self) -> None:
+            captured["flushed"] = True
+
+    client = mcp_client.create_client({"path": "server.js", "node_path": "node"})
+    client["process"] = StubProcess()
+    request = {"jsonrpc": "2.0", "id": "abc", "method": "tools/list"}
+    mcp_client.send_json_rpc_request(client, request)
+    writes = captured.get("writes", [])
+    assert len(writes) == 1
+    payload = writes[0].strip()
+    data = mcp_client.loads_json(payload)
+    assert data["method"] == "tools/list"
+    assert data["id"] == "abc"
+    assert data["jsonrpc"] == "2.0"
+    assert captured.get("flushed")
+
+
+def test_read_response_parses_json():
+    class StubProcess:
+        def __init__(self) -> None:
+            self.stdout = self
+            self._lines = ["{\"id\": \"1\", \"result\": \"ok\"}\n"]
+
+        def readline(self) -> str:
+            if not self._lines:
+                return ""
+            return self._lines.pop(0)
+
+    client = mcp_client.create_client({"path": "server.js", "node_path": "node"})
+    client["process"] = StubProcess()
+    response = mcp_client.read_json_rpc_response(client)
+    assert response["result"] == "ok"
+
+
+def test_invoke_tool_roundtrip(monkeypatch):
+    request_data = {}
+    response_queue = ["{\"id\": \"1\", \"result\": {\"ok\": true}}\n"]
+
+    class StubProcess:
+        def __init__(self) -> None:
+            self.stdin = self
+            self.stdout = self
+
+        def write(self, value: str) -> None:
+            request_data.setdefault("writes", []).append(value)
+
+        def flush(self) -> None:
+            request_data["flushed"] = True
+
+        def readline(self) -> str:
+            return response_queue.pop(0)
+
+    generator = mcp_client.create_request_id_generator()
+    monkeypatch.setattr(mcp_client, "create_request_id_generator", lambda: generator)
+
+    client = mcp_client.create_client({"path": "server.js", "node_path": "node"})
+    client["process"] = StubProcess()
+    result = mcp_client.invoke_tool(client, "tools/call", {"name": "tool", "arguments": {"foo": "bar"}})
+    assert request_data["writes"]
+    assert result == {"ok": True}
+
+
+def test_invoke_tool_error(monkeypatch):
+    class StubProcess:
+        def __init__(self) -> None:
+            self.stdin = self
+            self.stdout = self
+
+        def write(self, value: str) -> None:
+            pass
+
+        def flush(self) -> None:
+            pass
+
+        def readline(self) -> str:
+            return "{\"id\": \"1\", \"error\": {\"message\": \"failed\"}}\n"
+
+    monkeypatch.setattr(mcp_client, "create_request_id_generator", lambda: mcp_client.create_request_id_generator())
+    client = mcp_client.create_client({"path": "server.js", "node_path": "node"})
+    client["process"] = StubProcess()
+    with pytest.raises(RuntimeError):
+        mcp_client.invoke_tool(client, "tools/call", {})

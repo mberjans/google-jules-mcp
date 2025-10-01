@@ -142,6 +142,89 @@ def stop_client(client: Dict[str, object]) -> bool:
     return True
 
 
+def create_request_id_generator():
+    """Return a callable that generates unique JSON-RPC request identifiers."""
+    state = {"value": 0}
+
+    def _next_id() -> str:
+        state["value"] = state["value"] + 1
+        return str(state["value"])
+
+    return _next_id
+
+
+def build_json_rpc_request(method: str, params: Dict[str, object], generator) -> Dict[str, object]:
+    """Construct a JSON-RPC 2.0 request dictionary."""
+    if generator is None:
+        generator = create_request_id_generator()
+    request_id = generator()
+    request: Dict[str, object] = {
+        "jsonrpc": "2.0",
+        "id": request_id,
+        "method": method,
+        "params": params,
+    }
+    return request
+
+
+def send_json_rpc_request(client: Dict[str, object], request: Dict[str, object]) -> None:
+    """Serialize and send a JSON-RPC request via the client's subprocess stdin."""
+    process = client.get("process")
+    if process is None or not hasattr(process, "stdin"):
+        raise RuntimeError("MCP client process is not running")
+    serialized = dumps_json(request) + "\n"
+    process.stdin.write(serialized)
+    process.stdin.flush()
+
+
+def read_json_rpc_response(client: Dict[str, object]) -> Dict[str, object]:
+    """Read and deserialize a JSON-RPC response from the client's subprocess stdout."""
+    process = client.get("process")
+    if process is None or not hasattr(process, "stdout"):
+        raise RuntimeError("MCP client process is not running")
+    while True:
+        line = process.stdout.readline()
+        if line == "":
+            raise RuntimeError("No response received from MCP server")
+        stripped = line.strip()
+        if stripped:
+            response = json.loads(stripped)
+            if not isinstance(response, dict):
+                raise RuntimeError("Invalid JSON-RPC response format")
+            return response
+
+
+def _get_or_create_request_id_generator(client: Dict[str, object]):
+    generator = client.get("_request_id_generator")
+    if generator is None:
+        generator = create_request_id_generator()
+        client["_request_id_generator"] = generator
+    return generator
+
+
+def invoke_tool(client: Dict[str, object], method: str, params: Dict[str, object]) -> Dict[str, object]:
+    """Send a JSON-RPC request and return the result field from the response."""
+    generator = _get_or_create_request_id_generator(client)
+    request = build_json_rpc_request(method, params, generator)
+    send_json_rpc_request(client, request)
+    response = read_json_rpc_response(client)
+    if "error" in response:
+        error = response["error"]
+        message = "MCP server returned an error"
+        if isinstance(error, dict) and "message" in error:
+            message = str(error.get("message"))
+        raise RuntimeError(message)
+    result = response.get("result")
+    if result is None:
+        raise RuntimeError("MCP server response missing result field")
+    if isinstance(result, dict):
+        normalized: Dict[str, object] = {}
+        for key, value in result.items():
+            normalized[key] = value
+        return normalized
+    return {"value": result}
+
+
 class _ClientContext(AbstractContextManager):
     """Context manager implementation for MCP client lifecycle."""
 

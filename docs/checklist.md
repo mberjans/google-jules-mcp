@@ -106,31 +106,31 @@ This checklist breaks down each ticket into tiny, testable tasks following Test-
 - [x] JJM-003-T26: Add logging for start/stop operations
 - [x] JJM-003-T27: Add docstrings to all methods
 - [x] JJM-003-T28: Run tests again to verify refactoring
-- [ ] JJM-003-T29: Check code coverage: `pytest tests/test_mcp_client.py --cov=src.mcp_client`
-- [ ] JJM-003-T30: Commit changes: "JJM-003: Implement MCP client foundation with tests"
-- [ ] JJM-003-T31: Push to repository
+- [x] JJM-003-T29: Check code coverage: `pytest tests/test_mcp_client.py --cov=src.mcp_client`
+- [x] JJM-003-T30: Commit changes: "JJM-003: Implement MCP client foundation with tests"
+- [x] JJM-003-T31: Push to repository
 
 ---
 
 #### JJM-004: MCP Tool Invocation
 **TDD: Write tests for JSON-RPC communication**
 
-- [ ] JJM-004-T01: Add test for `_generate_request_id()` method in test_mcp_client.py
-- [ ] JJM-004-T02: Write test for JSON-RPC request format
-- [ ] JJM-004-T03: Write test for `_send_request()` method
-- [ ] JJM-004-T04: Write test for request serialization to JSON
-- [ ] JJM-004-T05: Write test for writing to stdin
-- [ ] JJM-004-T06: Write test for `_read_response()` method
-- [ ] JJM-004-T07: Write test for reading from stdout
-- [ ] JJM-004-T08: Write test for response deserialization from JSON
-- [ ] JJM-004-T09: Write test for `invoke_tool()` method
-- [ ] JJM-004-T10: Write test for tool invocation with arguments
-- [ ] JJM-004-T11: Write test for response parsing (success case)
-- [ ] JJM-004-T12: Write test for response parsing (error case)
-- [ ] JJM-004-T13: Write test for request/response correlation by ID
+- [x] JJM-004-T01: Add test for `_generate_request_id()` method in test_mcp_client.py
+- [x] JJM-004-T02: Write test for JSON-RPC request format
+- [x] JJM-004-T03: Write test for `_send_request()` method
+- [x] JJM-004-T04: Write test for request serialization to JSON
+- [x] JJM-004-T05: Write test for writing to stdin
+- [x] JJM-004-T06: Write test for `_read_response()` method
+- [x] JJM-004-T07: Write test for reading from stdout
+- [x] JJM-004-T08: Write test for response deserialization from JSON
+- [x] JJM-004-T09: Write test for `invoke_tool()` method
+- [x] JJM-004-T10: Write test for tool invocation with arguments
+- [x] JJM-004-T11: Write test for response parsing (success case)
+- [x] JJM-004-T12: Write test for response parsing (error case)
+- [x] JJM-004-T13: Write test for request/response correlation by ID
 - [ ] JJM-004-T14: Write test for timeout in read_response
 - [ ] JJM-004-T15: Write test for malformed JSON handling
-- [ ] JJM-004-T16: Run tests (should fail - Red phase): `pytest tests/test_mcp_client.py::test_invoke -v`
+- [x] JJM-004-T16: Run tests (should fail - Red phase): `pytest tests/test_mcp_client.py::test_invoke -v`
 - [ ] JJM-004-T17: Implement `_generate_request_id()` using uuid or counter
 - [ ] JJM-004-T18: Implement `_send_request()` method
 - [ ] JJM-004-T19: Create JSON-RPC 2.0 request structure
