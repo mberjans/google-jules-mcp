@@ -25,8 +25,8 @@ This checklist breaks down each ticket into tiny, testable tasks following Test-
 - [x] JJM-001-T08: Create `jules_job_manager/tests/__init__.py`
 - [x] JJM-001-T09: Create `jules_job_manager/requirements.txt` with initial dependencies
 - [x] JJM-001-T10: Create `jules_job_manager/setup.py` with package metadata
-- [ ] JJM-001-T11: Create `jules_job_manager/.gitignore` (if not exists)
-- [ ] JJM-001-T12: Create `jules_job_manager/README.md` with basic info
+- [x] JJM-001-T11: Create `jules_job_manager/.gitignore` (if not exists)
+- [x] JJM-001-T12: Create `jules_job_manager/README.md` with basic info
 - [ ] JJM-001-T13: Create `jules_job_manager/config/config.json` with default settings
 - [ ] JJM-001-T14: Create Python virtual environment: `python -m venv venv`
 - [ ] JJM-001-T15: Activate virtual environment
