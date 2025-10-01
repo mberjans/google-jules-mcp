@@ -19,7 +19,7 @@ This checklist breaks down each ticket into tiny, testable tasks following Test-
 - [x] JJM-001-T02: Create `jules_job_manager/src/` directory
 - [x] JJM-001-T03: Create `jules_job_manager/tests/` directory
 - [x] JJM-001-T04: Create `jules_job_manager/config/` directory
-- [ ] JJM-001-T05: Create `jules_job_manager/data/` directory
+- [x] JJM-001-T05: Create `jules_job_manager/data/` directory
 - [ ] JJM-001-T06: Create `jules_job_manager/docs/` directory
 - [ ] JJM-001-T07: Create `jules_job_manager/src/__init__.py`
 - [ ] JJM-001-T08: Create `jules_job_manager/tests/__init__.py`
