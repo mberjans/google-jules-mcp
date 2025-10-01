@@ -31,8 +31,8 @@ This checklist breaks down each ticket into tiny, testable tasks following Test-
 - [x] JJM-001-T14: Create Python virtual environment: `python -m venv venv`
 - [x] JJM-001-T15: Activate virtual environment
 - [x] JJM-001-T16: Install dependencies: `pip install -r requirements.txt`
-- [ ] JJM-001-T17: Verify project structure with `tree` or `ls -R`
-- [ ] JJM-001-T18: Run `python -m pytest --collect-only` to verify test discovery
+- [x] JJM-001-T17: Verify project structure with `tree` or `ls -R`
+- [x] JJM-001-T18: Run `python -m pytest --collect-only` to verify test discovery
 - [ ] JJM-001-T19: Commit changes: "JJM-001: Set up project structure"
 - [ ] JJM-001-T20: Push to repository
 
