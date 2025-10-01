@@ -30,7 +30,7 @@ This checklist breaks down each ticket into tiny, testable tasks following Test-
 - [x] JJM-001-T13: Create `jules_job_manager/config/config.json` with default settings
 - [x] JJM-001-T14: Create Python virtual environment: `python -m venv venv`
 - [x] JJM-001-T15: Activate virtual environment
-- [ ] JJM-001-T16: Install dependencies: `pip install -r requirements.txt`
+- [x] JJM-001-T16: Install dependencies: `pip install -r requirements.txt`
 - [ ] JJM-001-T17: Verify project structure with `tree` or `ls -R`
 - [ ] JJM-001-T18: Run `python -m pytest --collect-only` to verify test discovery
 - [ ] JJM-001-T19: Commit changes: "JJM-001: Set up project structure"
