@@ -1,0 +1,13 @@
+{
+  "mcp_server": {
+    "path": "../google-jules-mcp/dist/index.js",
+    "node_path": "node"
+  },
+  "storage": {
+    "data_path": "./data/tasks.json"
+  },
+  "monitoring": {
+    "default_interval": 30,
+    "max_retries": 3
+  }
+}
