@@ -17,7 +17,7 @@ This checklist breaks down each ticket into tiny, testable tasks following Test-
 #### JJM-001: Project Structure Setup
 - [x] JJM-001-T01: Create root directory `jules_job_manager/`
 - [x] JJM-001-T02: Create `jules_job_manager/src/` directory
-- [ ] JJM-001-T03: Create `jules_job_manager/tests/` directory
+- [x] JJM-001-T03: Create `jules_job_manager/tests/` directory
 - [ ] JJM-001-T04: Create `jules_job_manager/config/` directory
 - [ ] JJM-001-T05: Create `jules_job_manager/data/` directory
 - [ ] JJM-001-T06: Create `jules_job_manager/docs/` directory
