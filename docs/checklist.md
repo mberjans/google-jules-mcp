@@ -225,24 +225,24 @@ This checklist breaks down each ticket into tiny, testable tasks following Test-
 #### JJM-007: Job Manager - List Tasks
 **TDD: Write tests for list_tasks functionality**
 
-- [ ] JJM-007-T01: Write test for `list_tasks()` method in test_job_manager.py
-- [ ] JJM-007-T02: Write test for listing all tasks
-- [ ] JJM-007-T03: Write test for filtering by status="pending"
-- [ ] JJM-007-T04: Write test for filtering by status="in_progress"
-- [ ] JJM-007-T05: Write test for filtering by status="completed"
-- [ ] JJM-007-T06: Write test for empty task list
-- [ ] JJM-007-T07: Write test for storage integration
-- [ ] JJM-007-T08: Write test for return type (List[JulesTask])
-- [ ] JJM-007-T09: Run tests (should fail - Red phase): `pytest tests/test_job_manager.py::test_list -v`
-- [ ] JJM-007-T10: Implement `list_tasks()` method in JobManager
-- [ ] JJM-007-T11: Add status parameter with default None
-- [ ] JJM-007-T12: Call storage.list_tasks(status)
-- [ ] JJM-007-T13: Return list of JulesTask objects
-- [ ] JJM-007-T14: Run tests (should pass - Green phase): `pytest tests/test_job_manager.py::test_list -v`
-- [ ] JJM-007-T15: Add docstring to list_tasks method
-- [ ] JJM-007-T16: Add type hints
-- [ ] JJM-007-T17: Run tests again to verify refactoring
-- [ ] JJM-007-T18: Check code coverage for list_tasks
+- [x] JJM-007-T01: Write test for `list_tasks()` method in test_job_manager.py
+- [x] JJM-007-T02: Write test for listing all tasks
+- [x] JJM-007-T03: Write test for filtering by status="pending"
+- [x] JJM-007-T04: Write test for filtering by status="in_progress"
+- [x] JJM-007-T05: Write test for filtering by status="completed"
+- [x] JJM-007-T06: Write test for empty task list
+- [x] JJM-007-T07: Write test for storage integration
+- [x] JJM-007-T08: Write test for return type (List[JulesTask])
+- [x] JJM-007-T09: Run tests (should fail - Red phase): `pytest tests/test_job_manager.py::test_list -v`
+- [x] JJM-007-T10: Implement `list_tasks()` method in JobManager
+- [x] JJM-007-T11: Add status parameter with default None
+- [x] JJM-007-T12: Call storage.list_tasks(status)
+- [x] JJM-007-T13: Return list of JulesTask objects
+- [x] JJM-007-T14: Run tests (should pass - Green phase): `pytest tests/test_job_manager.py::test_list -v`
+- [x] JJM-007-T15: Add docstring to list_tasks method
+- [x] JJM-007-T16: Add type hints
+- [x] JJM-007-T17: Run tests again to verify refactoring
+- [x] JJM-007-T18: Check code coverage for list_tasks
 - [ ] JJM-007-T19: Commit changes: "JJM-007: Implement list_tasks with tests"
 - [ ] JJM-007-T20: Push to repository
 

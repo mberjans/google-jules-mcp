@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
+
+from src import models, storage
 
 
 def _validate_required_dependency(name: str, value: Any) -> Any:
@@ -66,3 +68,23 @@ def create_job_manager(mcp_client: Any, storage: Any) -> Dict[str, Any]:
     manager["mcp_client"] = validated_client
     manager["storage"] = validated_storage
     return manager
+
+
+def list_tasks(manager: Dict[str, Any], status: Optional[str] = None) -> List[Dict[str, object]]:
+    """Return normalized task dictionaries from the storage backend.
+
+    Args:
+        manager: Job manager dictionary created by ``create_job_manager``.
+        status: Optional status filter passed to storage.
+
+    Returns:
+        A list of task dictionaries normalized via ``models.jules_task_from_dict``.
+    """
+    storage_manager = manager.get("storage")
+    if storage_manager is None:
+        raise ValueError("Storage manager is missing")
+    raw_tasks = storage.list_tasks(storage_manager, status)
+    normalized: List[Dict[str, object]] = []
+    for entry in raw_tasks:
+        normalized.append(models.jules_task_from_dict(entry))
+    return normalized

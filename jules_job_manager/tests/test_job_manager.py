@@ -1,8 +1,11 @@
 """Tests for Job Manager initialization logic."""
 
+from datetime import datetime
+from typing import Dict, List
+
 import pytest
 
-from src import job_manager
+from src import job_manager, models, storage
 
 
 def create_dummy_mcp_client() -> dict:
@@ -43,3 +46,113 @@ def test_dependency_validation_rejects_invalid_inputs() -> None:
     storage = create_dummy_storage()
     with pytest.raises(TypeError):
         job_manager.create_job_manager(invalid_client, storage)
+
+
+def create_serialized_task(task_id: str, status: str) -> Dict[str, object]:
+    timestamp = datetime.now().astimezone()
+    task = models.create_jules_task(
+        task_id,
+        "Example Title",
+        "Example Description",
+        "owner/repo",
+        "main",
+        status,
+        timestamp,
+        timestamp,
+        "https://example.com/task",
+    )
+    serialized = models.jules_task_to_dict(task)
+    return serialized
+
+
+def create_storage_manager_with_tasks(tmp_path, tasks: List[Dict[str, object]]):
+    file_path = tmp_path / "tasks.json"
+    storage_manager = storage.create_storage(str(file_path))
+    for entry in tasks:
+        storage.save_task(storage_manager, entry)
+    return storage_manager
+
+
+def create_manager_with_storage(storage_manager):
+    mcp_client = create_dummy_mcp_client()
+    manager = job_manager.create_job_manager(mcp_client, storage_manager)
+    return manager
+
+
+def test_list_tasks_returns_all_tasks(tmp_path) -> None:
+    tasks: List[Dict[str, object]] = []
+    tasks.append(create_serialized_task("task-1", "pending"))
+    tasks.append(create_serialized_task("task-2", "completed"))
+    storage_manager = create_storage_manager_with_tasks(tmp_path, tasks)
+    manager = create_manager_with_storage(storage_manager)
+    result = job_manager.list_tasks(manager)
+    assert len(result) == 2
+    found_ids: List[str] = []
+    for item in result:
+        found_ids.append(item["id"])
+    assert "task-1" in found_ids
+    assert "task-2" in found_ids
+
+
+def test_list_tasks_filters_pending(tmp_path) -> None:
+    tasks: List[Dict[str, object]] = []
+    tasks.append(create_serialized_task("task-1", "pending"))
+    tasks.append(create_serialized_task("task-2", "in_progress"))
+    storage_manager = create_storage_manager_with_tasks(tmp_path, tasks)
+    manager = create_manager_with_storage(storage_manager)
+    result = job_manager.list_tasks(manager, status="pending")
+    assert len(result) == 1
+    assert result[0]["id"] == "task-1"
+
+
+def test_list_tasks_filters_in_progress(tmp_path) -> None:
+    tasks: List[Dict[str, object]] = []
+    tasks.append(create_serialized_task("task-1", "pending"))
+    tasks.append(create_serialized_task("task-2", "in_progress"))
+    storage_manager = create_storage_manager_with_tasks(tmp_path, tasks)
+    manager = create_manager_with_storage(storage_manager)
+    result = job_manager.list_tasks(manager, status="in_progress")
+    assert len(result) == 1
+    assert result[0]["id"] == "task-2"
+
+
+def test_list_tasks_filters_completed(tmp_path) -> None:
+    tasks: List[Dict[str, object]] = []
+    tasks.append(create_serialized_task("task-1", "completed"))
+    tasks.append(create_serialized_task("task-2", "in_progress"))
+    storage_manager = create_storage_manager_with_tasks(tmp_path, tasks)
+    manager = create_manager_with_storage(storage_manager)
+    result = job_manager.list_tasks(manager, status="completed")
+    assert len(result) == 1
+    assert result[0]["id"] == "task-1"
+
+
+def test_list_tasks_returns_empty_list_for_no_tasks(tmp_path) -> None:
+    tasks: List[Dict[str, object]] = []
+    storage_manager = create_storage_manager_with_tasks(tmp_path, tasks)
+    manager = create_manager_with_storage(storage_manager)
+    result = job_manager.list_tasks(manager)
+    assert result == []
+
+
+def test_list_tasks_uses_storage_data(tmp_path) -> None:
+    tasks: List[Dict[str, object]] = []
+    tasks.append(create_serialized_task("task-1", "pending"))
+    storage_manager = create_storage_manager_with_tasks(tmp_path, tasks)
+    manager = create_manager_with_storage(storage_manager)
+    new_task = create_serialized_task("task-2", "pending")
+    storage.save_task(storage_manager, new_task)
+    result = job_manager.list_tasks(manager)
+    assert len(result) == 2
+
+
+def test_list_tasks_returns_normalized_jules_tasks(tmp_path) -> None:
+    tasks: List[Dict[str, object]] = []
+    tasks.append(create_serialized_task("task-1", "pending"))
+    storage_manager = create_storage_manager_with_tasks(tmp_path, tasks)
+    manager = create_manager_with_storage(storage_manager)
+    result = job_manager.list_tasks(manager)
+    assert len(result) == 1
+    task = result[0]
+    assert isinstance(task["created_at"], datetime)
+    assert isinstance(task["updated_at"], datetime)
