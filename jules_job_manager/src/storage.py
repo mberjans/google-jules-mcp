@@ -32,11 +32,18 @@ def _load_raw_data(file_path: str) -> Dict[str, Dict[str, object]]:
         return {}
 
 
-def _save_raw_data(file_path: str, data: Dict[str, Dict[str, object]]) -> None:
-    """Persist task data to disk with stable formatting."""
+def _serialize_data(data: Dict[str, Dict[str, object]]) -> str:
+    """Serialize task data to a normalized JSON string."""
+    return json.dumps(data, indent=2, sort_keys=True)
+
+
+def _save_raw_data(file_path: str, data: Dict[str, Dict[str, object]], serialized: str) -> None:
+    """Persist task data to disk with stable formatting using atomic replace."""
     _ensure_parent_directory(file_path)
-    with open(file_path, "w", encoding="utf-8") as handle:
-        json.dump(data, handle, indent=2, sort_keys=True)
+    temp_path = Path(file_path).with_suffix(".tmp")
+    with open(temp_path, "w", encoding="utf-8") as handle:
+        handle.write(serialized)
+    os.replace(temp_path, file_path)
 
 
 def _copy_dict_of_dicts(data: Dict[str, Dict[str, object]]) -> Dict[str, Dict[str, object]]:
@@ -61,6 +68,7 @@ def create_storage(file_path: str) -> Dict[str, object]:
         "lock": Path(file_path).with_suffix(".lock"),
         "cache": None,
         "cache_mtime": None,
+        "cache_serialized": None,
     }
     return manager
 
@@ -97,14 +105,21 @@ def _load_all(manager: Dict[str, object]) -> Dict[str, Dict[str, object]]:
     if cached_data is not None and cached_mtime == current_mtime:
         return _copy_dict_of_dicts(cached_data)
     data = _load_raw_data(file_path)
+    serialized = _serialize_data(data)
     manager["cache"] = _copy_dict_of_dicts(data)
     manager["cache_mtime"] = current_mtime
+    manager["cache_serialized"] = serialized
     return _copy_dict_of_dicts(data)
 
 
 def _save_all(manager: Dict[str, object], data: Dict[str, Dict[str, object]]) -> None:
     """Save all tasks to the manager's backing file."""
     file_path = storage_path(manager)
+    serialized = _serialize_data(data)
+    cached_serialized = manager.get("cache_serialized")
+    if cached_serialized is not None and cached_serialized == serialized:
+        manager["cache"] = _copy_dict_of_dicts(data)
+        return
     existing = manager.get("cache")
     if existing is not None:
         same = True
@@ -113,9 +128,12 @@ def _save_all(manager: Dict[str, object], data: Dict[str, Dict[str, object]]) ->
                 same = False
                 break
         if same and len(existing) == len(data):
+            manager["cache"] = _copy_dict_of_dicts(data)
+            manager["cache_serialized"] = serialized
             return
-    _save_raw_data(file_path, data)
+    _save_raw_data(file_path, data, serialized)
     manager["cache"] = _copy_dict_of_dicts(data)
+    manager["cache_serialized"] = serialized
     if os.path.exists(file_path):
         manager["cache_mtime"] = os.path.getmtime(file_path)
 
