@@ -203,20 +203,20 @@ This checklist breaks down each ticket into tiny, testable tasks following Test-
 #### JJM-006: Job Manager Core Structure
 **TDD: Write tests for JobManager initialization**
 
-- [ ] JJM-006-T01: Create `jules_job_manager/tests/test_job_manager.py`
-- [ ] JJM-006-T02: Write test for `JobManager.__init__()` with dependencies
-- [ ] JJM-006-T03: Write test for MCPClient injection
-- [ ] JJM-006-T04: Write test for Storage injection
-- [ ] JJM-006-T05: Write test for dependency validation
-- [ ] JJM-006-T06: Run tests (should fail - Red phase): `pytest tests/test_job_manager.py -v`
-- [ ] JJM-006-T07: Create `jules_job_manager/src/job_manager.py`
-- [ ] JJM-006-T08: Implement `JobManager` class
-- [ ] JJM-006-T09: Implement __init__ with mcp_client parameter
-- [ ] JJM-006-T10: Implement __init__ with storage parameter
-- [ ] JJM-006-T11: Add dependency validation in __init__
-- [ ] JJM-006-T12: Run tests (should pass - Green phase): `pytest tests/test_job_manager.py -v`
-- [ ] JJM-006-T13: Add docstrings to class and __init__
-- [ ] JJM-006-T14: Run tests again to verify refactoring
+- [x] JJM-006-T01: Create `jules_job_manager/tests/test_job_manager.py`
+- [x] JJM-006-T02: Write test for `JobManager.__init__()` with dependencies
+- [x] JJM-006-T03: Write test for MCPClient injection
+- [x] JJM-006-T04: Write test for Storage injection
+- [x] JJM-006-T05: Write test for dependency validation
+- [x] JJM-006-T06: Run tests (should fail - Red phase): `pytest tests/test_job_manager.py -v`
+- [x] JJM-006-T07: Create `jules_job_manager/src/job_manager.py`
+- [x] JJM-006-T08: Implement `JobManager` class
+- [x] JJM-006-T09: Implement __init__ with mcp_client parameter
+- [x] JJM-006-T10: Implement __init__ with storage parameter
+- [x] JJM-006-T11: Add dependency validation in __init__
+- [x] JJM-006-T12: Run tests (should pass - Green phase): `pytest tests/test_job_manager.py -v`
+- [x] JJM-006-T13: Add docstrings to class and __init__
+- [x] JJM-006-T14: Run tests again to verify refactoring
 - [ ] JJM-006-T15: Commit changes: "JJM-006: Implement JobManager core structure with tests"
 - [ ] JJM-006-T16: Push to repository
 
