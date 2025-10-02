@@ -128,28 +128,28 @@ This checklist breaks down each ticket into tiny, testable tasks following Test-
 - [x] JJM-004-T11: Write test for response parsing (success case)
 - [x] JJM-004-T12: Write test for response parsing (error case)
 - [x] JJM-004-T13: Write test for request/response correlation by ID
-- [ ] JJM-004-T14: Write test for timeout in read_response
-- [ ] JJM-004-T15: Write test for malformed JSON handling
+- [x] JJM-004-T14: Write test for timeout in read_response
+- [x] JJM-004-T15: Write test for malformed JSON handling
 - [x] JJM-004-T16: Run tests (should fail - Red phase): `pytest tests/test_mcp_client.py::test_invoke -v`
-- [ ] JJM-004-T17: Implement `_generate_request_id()` using uuid or counter
-- [ ] JJM-004-T18: Implement `_send_request()` method
-- [ ] JJM-004-T19: Create JSON-RPC 2.0 request structure
-- [ ] JJM-004-T20: Serialize request to JSON and write to stdin
-- [ ] JJM-004-T21: Add newline delimiter after JSON
-- [ ] JJM-004-T22: Implement `_read_response()` method
-- [ ] JJM-004-T23: Read line from stdout
-- [ ] JJM-004-T24: Deserialize JSON response
-- [ ] JJM-004-T25: Implement `invoke_tool()` method
-- [ ] JJM-004-T26: Call _send_request with tool name and arguments
-- [ ] JJM-004-T27: Call _read_response to get result
-- [ ] JJM-004-T28: Parse response and extract result or error
-- [ ] JJM-004-T29: Add timeout handling with select or threading
-- [ ] JJM-004-T30: Add error handling for JSON parsing
-- [ ] JJM-004-T31: Run tests (should pass - Green phase): `pytest tests/test_mcp_client.py -v`
-- [ ] JJM-004-T32: Add request/response logging
-- [ ] JJM-004-T33: Add docstrings to all methods
-- [ ] JJM-004-T34: Run tests again to verify refactoring
-- [ ] JJM-004-T35: Check code coverage: `pytest tests/test_mcp_client.py --cov=src.mcp_client`
+- [x] JJM-004-T17: Implement `_generate_request_id()` using uuid or counter
+- [x] JJM-004-T18: Implement `_send_request()` method
+- [x] JJM-004-T19: Create JSON-RPC 2.0 request structure
+- [x] JJM-004-T20: Serialize request to JSON and write to stdin
+- [x] JJM-004-T21: Add newline delimiter after JSON
+- [x] JJM-004-T22: Implement `_read_response()` method
+- [x] JJM-004-T23: Read line from stdout
+- [x] JJM-004-T24: Deserialize JSON response
+- [x] JJM-004-T25: Implement `invoke_tool()` method
+- [x] JJM-004-T26: Call _send_request with tool name and arguments
+- [x] JJM-004-T27: Call _read_response to get result
+- [x] JJM-004-T28: Parse response and extract result or error
+- [x] JJM-004-T29: Add timeout handling with select or threading
+- [x] JJM-004-T30: Add error handling for JSON parsing
+- [x] JJM-004-T31: Run tests (should pass - Green phase): `pytest tests/test_mcp_client.py -v`
+- [x] JJM-004-T32: Add request/response logging
+- [x] JJM-004-T33: Add docstrings to all methods
+- [x] JJM-004-T34: Run tests again to verify refactoring
+- [x] JJM-004-T35: Check code coverage: `pytest tests/test_mcp_client.py --cov=src.mcp_client`
 - [ ] JJM-004-T36: Commit changes: "JJM-004: Implement MCP tool invocation with tests"
 - [ ] JJM-004-T37: Push to repository
 

@@ -259,3 +259,32 @@ def test_invoke_tool_error(monkeypatch):
     client["process"] = StubProcess()
     with pytest.raises(RuntimeError):
         mcp_client.invoke_tool(client, "tools/call", {})
+
+
+def test_read_response_timeout():
+    class StubProcess:
+        def __init__(self) -> None:
+            self.stdout = self
+
+        def readline(self) -> str:
+            raise TimeoutError()
+
+    client = mcp_client.create_client({"path": "server.js", "node_path": "node"})
+    client["process"] = StubProcess()
+    with pytest.raises(TimeoutError):
+        mcp_client.read_json_rpc_response(client)
+
+
+def test_read_response_malformed_json():
+    class StubProcess:
+        def __init__(self) -> None:
+            self.stdout = self
+            self._lines = ["not json\n"]
+
+        def readline(self) -> str:
+            return self._lines.pop(0)
+
+    client = mcp_client.create_client({"path": "server.js", "node_path": "node"})
+    client["process"] = StubProcess()
+    with pytest.raises(RuntimeError):
+        mcp_client.read_json_rpc_response(client)

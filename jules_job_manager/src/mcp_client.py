@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import json
 import logging
+import select
 import subprocess
-from contextlib import AbstractContextManager
 from typing import Dict, Iterable, Optional
 
 DEFAULT_TIMEOUT_SECONDS = 5.0
@@ -138,7 +138,6 @@ def stop_client(client: Dict[str, object]) -> bool:
         client["process"] = None
         return True
     client["process"] = None
-    LOGGER.info("MCP server process stopped successfully")
     return True
 
 
@@ -146,8 +145,8 @@ def create_request_id_generator():
     """Return a callable that generates unique JSON-RPC request identifiers."""
     state = {"value": 0}
 
-    def _next_id() -> str:
-        state["value"] = state["value"] + 1
+    def _next_id():
+        state["value"] += 1
         return str(state["value"])
 
     return _next_id
@@ -172,6 +171,10 @@ def send_json_rpc_request(client: Dict[str, object], request: Dict[str, object])
     process = client.get("process")
     if process is None or not hasattr(process, "stdin"):
         raise RuntimeError("MCP client process is not running")
+    LOGGER.debug(
+        "Sending JSON-RPC request",
+        extra={"method": request.get("method"), "id": request.get("id")},
+    )
     serialized = dumps_json(request) + "\n"
     process.stdin.write(serialized)
     process.stdin.flush()
@@ -182,15 +185,24 @@ def read_json_rpc_response(client: Dict[str, object]) -> Dict[str, object]:
     process = client.get("process")
     if process is None or not hasattr(process, "stdout"):
         raise RuntimeError("MCP client process is not running")
+    timeout = float(client.get("timeout", DEFAULT_TIMEOUT_SECONDS))
     while True:
-        line = process.stdout.readline()
+        line = _readline_with_timeout(process.stdout, timeout)
         if line == "":
             raise RuntimeError("No response received from MCP server")
         stripped = line.strip()
         if stripped:
-            response = json.loads(stripped)
+            try:
+                response = json.loads(stripped)
+            except json.JSONDecodeError as error:
+                LOGGER.error("Failed to decode MCP response", extra={"payload": stripped})
+                raise RuntimeError("Invalid JSON-RPC response format") from error
             if not isinstance(response, dict):
                 raise RuntimeError("Invalid JSON-RPC response format")
+            LOGGER.debug(
+                "Received JSON-RPC response",
+                extra={"keys": list(response.keys())},
+            )
             return response
 
 
@@ -213,6 +225,7 @@ def invoke_tool(client: Dict[str, object], method: str, params: Dict[str, object
         message = "MCP server returned an error"
         if isinstance(error, dict) and "message" in error:
             message = str(error.get("message"))
+        LOGGER.error("MCP server returned error", extra={"message": message})
         raise RuntimeError(message)
     result = response.get("result")
     if result is None:
@@ -221,37 +234,55 @@ def invoke_tool(client: Dict[str, object], method: str, params: Dict[str, object
         normalized: Dict[str, object] = {}
         for key, value in result.items():
             normalized[key] = value
+        LOGGER.debug("Parsed JSON-RPC result dictionary", extra={"keys": list(normalized.keys())})
         return normalized
+    LOGGER.debug("Wrapped non-dict JSON-RPC result", extra={"type": type(result).__name__})
     return {"value": result}
 
 
-class _ClientContext(AbstractContextManager):
-    """Context manager implementation for MCP client lifecycle."""
+def _readline_with_timeout(stream, timeout: float) -> str:
+    """Read a line from stream, respecting timeout when possible."""
+    if timeout is None:
+        return stream.readline()
+    if hasattr(stream, "fileno"):
+        try:
+            fileno_method = stream.fileno
+        except AttributeError:
+            fileno_method = None
+        if fileno_method is not None:
+            try:
+                _ = fileno_method()
+                readable, _, _ = select.select([stream], [], [], timeout)
+                if not readable:
+                    raise TimeoutError()
+            except (OSError, ValueError):
+                pass
+    return stream.readline()
 
-    def __init__(self, client: Dict[str, object]):
-        self._client = client
-        self._entered = False
-        self._started = False
 
-    def __enter__(self) -> Dict[str, object]:
-        if self._entered:
+def use_client(client: Dict[str, object]):
+    """Return a context manager that manages MCP client lifecycle."""
+    state = {"entered": False, "started": False}
+
+    def __enter__(self):
+        if state["entered"]:
             raise RuntimeError("Client context already in use")
-        self._entered = True
-        active = int(self._client.get("active_contexts", 0))
+        active = int(client.get("active_contexts", 0))
         if active > 0:
             raise RuntimeError("Client context already active")
-        self._client["active_contexts"] = active + 1
-        start_client(self._client)
-        self._started = True
-        return self._client
+        state["entered"] = True
+        client["active_contexts"] = active + 1
+        start_client(client)
+        state["started"] = True
+        return client
 
-    def __exit__(self, exc_type, exc, exc_tb) -> None:
-        self._client["active_contexts"] = 0
-        if self._started:
-            stop_client(self._client)
-        self._started = False
+    def __exit__(self, exc_type, exc, exc_tb):
+        if state["started"]:
+            stop_client(client)
+            state["started"] = False
+        client["active_contexts"] = 0
+        state["entered"] = False
+        return False
 
-
-def use_client(client: Dict[str, object]) -> _ClientContext:
-    """Return context manager for the MCP client lifecycle."""
-    return _ClientContext(client)
+    context_type = type("_ClientContext", (), {"__enter__": __enter__, "__exit__": __exit__})
+    return context_type()
