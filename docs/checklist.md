@@ -158,41 +158,41 @@ This checklist breaks down each ticket into tiny, testable tasks following Test-
 #### JJM-005: Storage Layer Implementation
 **TDD: Write tests for storage operations**
 
-- [ ] JJM-005-T01: Create `jules_job_manager/tests/test_storage.py`
-- [ ] JJM-005-T02: Write test for `Storage.__init__()` with file path
-- [ ] JJM-005-T03: Write test for `save_task()` method
-- [ ] JJM-005-T04: Write test for saving task to JSON file
-- [ ] JJM-005-T05: Write test for `get_task()` method
-- [ ] JJM-005-T06: Write test for retrieving task by ID
-- [ ] JJM-005-T07: Write test for `list_tasks()` method
-- [ ] JJM-005-T08: Write test for listing all tasks
-- [ ] JJM-005-T09: Write test for filtering tasks by status
-- [ ] JJM-005-T10: Write test for `delete_task()` method
-- [ ] JJM-005-T11: Write test for task not found error
-- [ ] JJM-005-T12: Write test for file creation if not exists
-- [ ] JJM-005-T13: Write test for concurrent access handling
-- [ ] JJM-005-T14: Write test for data persistence across instances
-- [ ] JJM-005-T15: Run tests (should fail - Red phase): `pytest tests/test_storage.py -v`
-- [ ] JJM-005-T16: Create `jules_job_manager/src/storage.py`
-- [ ] JJM-005-T17: Implement `Storage` class with __init__
-- [ ] JJM-005-T18: Implement file path configuration
-- [ ] JJM-005-T19: Implement `_load_data()` method to read JSON
-- [ ] JJM-005-T20: Implement `_save_data()` method to write JSON
-- [ ] JJM-005-T21: Implement `save_task()` method
-- [ ] JJM-005-T22: Convert JulesTask to dict and save
-- [ ] JJM-005-T23: Implement `get_task()` method
-- [ ] JJM-005-T24: Load data and find task by ID
-- [ ] JJM-005-T25: Implement `list_tasks()` method
-- [ ] JJM-005-T26: Add status filtering logic
-- [ ] JJM-005-T27: Implement `delete_task()` method
-- [ ] JJM-005-T28: Add file locking for concurrent access
-- [ ] JJM-005-T29: Add error handling for file I/O
-- [ ] JJM-005-T30: Create data directory if not exists
-- [ ] JJM-005-T31: Run tests (should pass - Green phase): `pytest tests/test_storage.py -v`
-- [ ] JJM-005-T32: Add docstrings to all methods
+- [x] JJM-005-T01: Create `jules_job_manager/tests/test_storage.py`
+- [x] JJM-005-T02: Write test for `Storage.__init__()` with file path
+- [x] JJM-005-T03: Write test for `save_task()` method
+- [x] JJM-005-T04: Write test for saving task to JSON file
+- [x] JJM-005-T05: Write test for `get_task()` method
+- [x] JJM-005-T06: Write test for retrieving task by ID
+- [x] JJM-005-T07: Write test for `list_tasks()` method
+- [x] JJM-005-T08: Write test for listing all tasks
+- [x] JJM-005-T09: Write test for filtering tasks by status
+- [x] JJM-005-T10: Write test for `delete_task()` method
+- [x] JJM-005-T11: Write test for task not found error
+- [x] JJM-005-T12: Write test for file creation if not exists
+- [x] JJM-005-T13: Write test for concurrent access handling
+- [x] JJM-005-T14: Write test for data persistence across instances
+- [x] JJM-005-T15: Run tests (should fail - Red phase): `pytest tests/test_storage.py -v`
+- [x] JJM-005-T16: Create `jules_job_manager/src/storage.py`
+- [x] JJM-005-T17: Implement `Storage` class with __init__
+- [x] JJM-005-T18: Implement file path configuration
+- [x] JJM-005-T19: Implement `_load_data()` method to read JSON
+- [x] JJM-005-T20: Implement `_save_data()` method to write JSON
+- [x] JJM-005-T21: Implement `save_task()` method
+- [x] JJM-005-T22: Convert JulesTask to dict and save
+- [x] JJM-005-T23: Implement `get_task()` method
+- [x] JJM-005-T24: Load data and find task by ID
+- [x] JJM-005-T25: Implement `list_tasks()` method
+- [x] JJM-005-T26: Add status filtering logic
+- [x] JJM-005-T27: Implement `delete_task()` method
+- [x] JJM-005-T28: Add file locking for concurrent access
+- [x] JJM-005-T29: Add error handling for file I/O
+- [x] JJM-005-T30: Create data directory if not exists
+- [x] JJM-005-T31: Run tests (should pass - Green phase): `pytest tests/test_storage.py -v`
+- [x] JJM-005-T32: Add docstrings to all methods
 - [ ] JJM-005-T33: Optimize file I/O operations
-- [ ] JJM-005-T34: Run tests again to verify refactoring
-- [ ] JJM-005-T35: Check code coverage: `pytest tests/test_storage.py --cov=src.storage`
+- [x] JJM-005-T34: Run tests again to verify refactoring
+- [x] JJM-005-T35: Check code coverage: `pytest tests/test_storage.py --cov=src.storage`
 - [ ] JJM-005-T36: Commit changes: "JJM-005: Implement storage layer with tests"
 - [ ] JJM-005-T37: Push to repository
 
