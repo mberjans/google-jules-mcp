@@ -193,8 +193,8 @@ This checklist breaks down each ticket into tiny, testable tasks following Test-
 - [x] JJM-005-T33: Optimize file I/O operations
 - [x] JJM-005-T34: Run tests again to verify refactoring
 - [x] JJM-005-T35: Check code coverage: `pytest tests/test_storage.py --cov=src.storage`
-- [ ] JJM-005-T36: Commit changes: "JJM-005: Implement storage layer with tests"
-- [ ] JJM-005-T37: Push to repository
+- [x] JJM-005-T36: Commit changes: "JJM-005: Implement storage layer with tests"
+- [x] JJM-005-T37: Push to repository
 
 ---
 
