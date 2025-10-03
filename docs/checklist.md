@@ -243,40 +243,40 @@ This checklist breaks down each ticket into tiny, testable tasks following Test-
 - [x] JJM-007-T16: Add type hints
 - [x] JJM-007-T17: Run tests again to verify refactoring
 - [x] JJM-007-T18: Check code coverage for list_tasks
-- [ ] JJM-007-T19: Commit changes: "JJM-007: Implement list_tasks with tests"
-- [ ] JJM-007-T20: Push to repository
+- [x] JJM-007-T19: Commit changes: "JJM-007: Implement list_tasks with tests"
+- [x] JJM-007-T20: Push to repository
 
 ---
 
 #### JJM-008: Job Manager - Get Task Details
 **TDD: Write tests for get_task functionality**
 
-- [ ] JJM-008-T01: Write test for `get_task()` method in test_job_manager.py
-- [ ] JJM-008-T02: Write test for getting task by valid ID
-- [ ] JJM-008-T03: Write test for MCP tool invocation (jules_get_task)
-- [ ] JJM-008-T04: Write test for response parsing
-- [ ] JJM-008-T05: Write test for JulesTask object creation
-- [ ] JJM-008-T06: Write test for storage update after fetch
-- [ ] JJM-008-T07: Write test for task not found error
-- [ ] JJM-008-T08: Write test for invalid task ID format
-- [ ] JJM-008-T09: Write test for MCP communication error
-- [ ] JJM-008-T10: Run tests (should fail - Red phase): `pytest tests/test_job_manager.py::test_get -v`
-- [ ] JJM-008-T11: Implement `get_task()` method in JobManager
-- [ ] JJM-008-T12: Add task_id parameter
-- [ ] JJM-008-T13: Call mcp_client.invoke_tool("jules_get_task", {"taskId": task_id})
-- [ ] JJM-008-T14: Parse response text to extract task details
-- [ ] JJM-008-T15: Create JulesTask object from parsed data
-- [ ] JJM-008-T16: Call storage.save_task() to update local storage
-- [ ] JJM-008-T17: Return JulesTask object
-- [ ] JJM-008-T18: Add error handling for task not found
-- [ ] JJM-008-T19: Add error handling for invalid ID format
-- [ ] JJM-008-T20: Add error handling for MCP errors
-- [ ] JJM-008-T21: Run tests (should pass - Green phase): `pytest tests/test_job_manager.py::test_get -v`
-- [ ] JJM-008-T22: Add docstring to get_task method
-- [ ] JJM-008-T23: Add type hints
-- [ ] JJM-008-T24: Add logging for operations
-- [ ] JJM-008-T25: Run tests again to verify refactoring
-- [ ] JJM-008-T26: Check code coverage for get_task
+- [x] JJM-008-T01: Write test for `get_task()` method in test_job_manager.py
+- [x] JJM-008-T02: Write test for getting task by valid ID
+- [x] JJM-008-T03: Write test for MCP tool invocation (jules_get_task)
+- [x] JJM-008-T04: Write test for response parsing
+- [x] JJM-008-T05: Write test for JulesTask object creation
+- [x] JJM-008-T06: Write test for storage update after fetch
+- [x] JJM-008-T07: Write test for task not found error
+- [x] JJM-008-T08: Write test for invalid task ID format
+- [x] JJM-008-T09: Write test for MCP communication error
+- [x] JJM-008-T10: Run tests (should fail - Red phase): `pytest tests/test_job_manager.py::test_get -v`
+- [x] JJM-008-T11: Implement `get_task()` method in JobManager
+- [x] JJM-008-T12: Add task_id parameter
+- [x] JJM-008-T13: Call mcp_client.invoke_tool("jules_get_task", {"taskId": task_id})
+- [x] JJM-008-T14: Parse response text to extract task details
+- [x] JJM-008-T15: Create JulesTask object from parsed data
+- [x] JJM-008-T16: Call storage.save_task() to update local storage
+- [x] JJM-008-T17: Return JulesTask object
+- [x] JJM-008-T18: Add error handling for task not found
+- [x] JJM-008-T19: Add error handling for invalid ID format
+- [x] JJM-008-T20: Add error handling for MCP errors
+- [x] JJM-008-T21: Run tests (should pass - Green phase): `pytest tests/test_job_manager.py::test_get -v`
+- [x] JJM-008-T22: Add docstring to get_task method
+- [x] JJM-008-T23: Add type hints
+- [x] JJM-008-T24: Add logging for operations
+- [x] JJM-008-T25: Run tests again to verify refactoring
+- [x] JJM-008-T26: Check code coverage for get_task
 - [ ] JJM-008-T27: Commit changes: "JJM-008: Implement get_task with tests"
 - [ ] JJM-008-T28: Push to repository
 
