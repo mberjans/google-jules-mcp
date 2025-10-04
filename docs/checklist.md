@@ -380,39 +380,39 @@ This checklist breaks down each ticket into tiny, testable tasks following Test-
 - [x] JJM-011-T23: Add logging for approval operations
 - [x] JJM-011-T24: Run tests again to verify refactoring
 - [x] JJM-011-T25: Check code coverage for approve_plan
-- [ ] JJM-011-T26: Commit changes: "JJM-011: Implement approve_plan with tests"
-- [ ] JJM-011-T27: Push to repository
+- [x] JJM-011-T26: Commit changes: "JJM-011: Implement approve_plan with tests"
+- [x] JJM-011-T27: Push to repository
 
 ---
 
 #### JJM-012: Job Manager - Resume Task
 **TDD: Write tests for resume_task functionality**
 
-- [ ] JJM-012-T01: Write test for `resume_task()` method in test_job_manager.py
-- [ ] JJM-012-T02: Write test for resuming task with task_id
-- [ ] JJM-012-T03: Write test for MCP tool invocation (jules_resume_task)
-- [ ] JJM-012-T04: Write test for success response (returns True)
-- [ ] JJM-012-T05: Write test for failure response (returns False)
-- [ ] JJM-012-T06: Write test for task status update from "paused" to "in_progress"
-- [ ] JJM-012-T07: Write test for task not in paused state error
-- [ ] JJM-012-T08: Write test for resume failure
-- [ ] JJM-012-T09: Run tests (should fail - Red phase): `pytest tests/test_job_manager.py::test_resume -v`
-- [ ] JJM-012-T10: Implement `resume_task()` method in JobManager
-- [ ] JJM-012-T11: Add parameter: task_id
-- [ ] JJM-012-T12: Call mcp_client.invoke_tool("jules_resume_task", {"taskId": task_id})
-- [ ] JJM-012-T13: Parse response for success/failure
-- [ ] JJM-012-T14: If successful, get task from storage
-- [ ] JJM-012-T15: Update task.status to "in_progress"
-- [ ] JJM-012-T16: Save updated task to storage
-- [ ] JJM-012-T17: Return boolean success status
-- [ ] JJM-012-T18: Add error handling for invalid state
-- [ ] JJM-012-T19: Add error handling for resume failures
-- [ ] JJM-012-T20: Run tests (should pass - Green phase): `pytest tests/test_job_manager.py::test_resume -v`
-- [ ] JJM-012-T21: Add docstring to resume_task method
-- [ ] JJM-012-T22: Add type hints
-- [ ] JJM-012-T23: Add logging for resume operations
-- [ ] JJM-012-T24: Run tests again to verify refactoring
-- [ ] JJM-012-T25: Check code coverage for resume_task
+- [x] JJM-012-T01: Write test for `resume_task()` method in test_job_manager.py
+- [x] JJM-012-T02: Write test for resuming task with task_id
+- [x] JJM-012-T03: Write test for MCP tool invocation (jules_resume_task)
+- [x] JJM-012-T04: Write test for success response (returns True)
+- [x] JJM-012-T05: Write test for failure response (returns False)
+- [x] JJM-012-T06: Write test for task status update from "paused" to "in_progress"
+- [x] JJM-012-T07: Write test for task not in paused state error
+- [x] JJM-012-T08: Write test for resume failure
+- [x] JJM-012-T09: Run tests (should fail - Red phase): `pytest tests/test_job_manager.py::test_resume -v`
+- [x] JJM-012-T10: Implement `resume_task()` method in JobManager
+- [x] JJM-012-T11: Add parameter: task_id
+- [x] JJM-012-T12: Call mcp_client.invoke_tool("jules_resume_task", {"taskId": task_id})
+- [x] JJM-012-T13: Parse response for success/failure
+- [x] JJM-012-T14: If successful, get task from storage
+- [x] JJM-012-T15: Update task.status to "in_progress"
+- [x] JJM-012-T16: Save updated task to storage
+- [x] JJM-012-T17: Return boolean success status
+- [x] JJM-012-T18: Add error handling for invalid state
+- [x] JJM-012-T19: Add error handling for resume failures
+- [x] JJM-012-T20: Run tests (should pass - Green phase): `pytest tests/test_job_manager.py::test_resume -v`
+- [x] JJM-012-T21: Add docstring to resume_task method
+- [x] JJM-012-T22: Add type hints
+- [x] JJM-012-T23: Add logging for resume operations
+- [x] JJM-012-T24: Run tests again to verify refactoring
+- [x] JJM-012-T25: Check code coverage for resume_task
 - [ ] JJM-012-T26: Commit changes: "JJM-012: Implement resume_task with tests"
 - [ ] JJM-012-T27: Push to repository
 
@@ -421,33 +421,33 @@ This checklist breaks down each ticket into tiny, testable tasks following Test-
 #### JJM-013: Job Manager - Monitor Task
 **TDD: Write tests for monitor_task functionality**
 
-- [ ] JJM-013-T01: Write test for `monitor_task()` method in test_job_manager.py
-- [ ] JJM-013-T02: Write test for monitoring with task_id and interval
-- [ ] JJM-013-T03: Write test for polling loop with time.sleep
-- [ ] JJM-013-T04: Write test for calling get_task in loop
-- [ ] JJM-013-T05: Write test for status change detection
-- [ ] JJM-013-T06: Write test for exit on "completed" status
-- [ ] JJM-013-T07: Write test for KeyboardInterrupt handling
-- [ ] JJM-013-T08: Write test for progress display
-- [ ] JJM-013-T09: Write test for task not found error
-- [ ] JJM-013-T10: Run tests (should fail - Red phase): `pytest tests/test_job_manager.py::test_monitor -v`
-- [ ] JJM-013-T11: Implement `monitor_task()` method in JobManager
-- [ ] JJM-013-T12: Add parameters: task_id, interval=30
-- [ ] JJM-013-T13: Create while loop for polling
-- [ ] JJM-013-T14: Call get_task(task_id) in loop
-- [ ] JJM-013-T15: Display current status with timestamp
-- [ ] JJM-013-T16: Check if status == "completed" and break
-- [ ] JJM-013-T17: Call time.sleep(interval)
-- [ ] JJM-013-T18: Wrap loop in try-except for KeyboardInterrupt
-- [ ] JJM-013-T19: Display "Monitoring stopped" on interrupt
-- [ ] JJM-013-T20: Add error handling for task not found
-- [ ] JJM-013-T21: Run tests (should pass - Green phase): `pytest tests/test_job_manager.py::test_monitor -v`
-- [ ] JJM-013-T22: Add rich library for progress display
-- [ ] JJM-013-T23: Add docstring to monitor_task method
-- [ ] JJM-013-T24: Add type hints
-- [ ] JJM-013-T25: Add logging for monitoring operations
-- [ ] JJM-013-T26: Run tests again to verify refactoring
-- [ ] JJM-013-T27: Check code coverage for monitor_task
+- [x] JJM-013-T01: Write test for `monitor_task()` method in test_job_manager.py
+- [x] JJM-013-T02: Write test for monitoring with task_id and interval
+- [x] JJM-013-T03: Write test for polling loop with time.sleep
+- [x] JJM-013-T04: Write test for calling get_task in loop
+- [x] JJM-013-T05: Write test for status change detection
+- [x] JJM-013-T06: Write test for exit on "completed" status
+- [x] JJM-013-T07: Write test for KeyboardInterrupt handling
+- [x] JJM-013-T08: Write test for progress display
+- [x] JJM-013-T09: Write test for task not found error
+- [x] JJM-013-T10: Run tests (should fail - Red phase): `pytest tests/test_job_manager.py::test_monitor -v`
+- [x] JJM-013-T11: Implement `monitor_task()` method in JobManager
+- [x] JJM-013-T12: Add parameters: task_id, interval=30
+- [x] JJM-013-T13: Create while loop for polling
+- [x] JJM-013-T14: Call get_task(task_id) in loop
+- [x] JJM-013-T15: Display current status with timestamp
+- [x] JJM-013-T16: Check if status == "completed" and break
+- [x] JJM-013-T17: Call time.sleep(interval)
+- [x] JJM-013-T18: Wrap loop in try-except for KeyboardInterrupt
+- [x] JJM-013-T19: Display "Monitoring stopped" on interrupt
+- [x] JJM-013-T20: Add error handling for task not found
+- [x] JJM-013-T21: Run tests (should pass - Green phase): `pytest tests/test_job_manager.py::test_monitor -v`
+- [x] JJM-013-T22: Add rich library for progress display
+- [x] JJM-013-T23: Add docstring to monitor_task method
+- [x] JJM-013-T24: Add type hints
+- [x] JJM-013-T25: Add logging for monitoring operations
+- [x] JJM-013-T26: Run tests again to verify refactoring
+- [x] JJM-013-T27: Check code coverage for monitor_task
 - [ ] JJM-013-T28: Commit changes: "JJM-013: Implement monitor_task with tests"
 - [ ] JJM-013-T29: Push to repository
 

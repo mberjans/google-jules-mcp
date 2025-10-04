@@ -4,13 +4,29 @@ from __future__ import annotations
 
 import json
 import logging
+import time
 from datetime import datetime
 from typing import Any, Dict, List, Optional
+
+from rich.console import Console
 
 from src import models, storage
 
 
 LOGGER = logging.getLogger(__name__)
+
+
+def _sleep(duration: float) -> None:
+    """Pause execution for the provided duration in seconds."""
+
+    time.sleep(duration)
+
+
+def _create_console() -> Console:
+    """Create a Rich console instance for formatted output."""
+
+    console = Console()
+    return console
 
 
 def _validate_required_dependency(name: str, value: Any) -> Any:
@@ -179,6 +195,48 @@ def get_task(manager: Dict[str, Any], task_id: str) -> Dict[str, object]:
     return normalized_task
 
 
+def monitor_task(manager: Dict[str, Any], task_id: str, interval: int = 30) -> None:
+    """Monitor task status changes by polling the MCP server."""
+
+    validated_id = _validate_task_identifier(task_id)
+    duration = _validate_monitor_interval(interval)
+    console = _create_console()
+    previous_status: Optional[str] = None
+    LOGGER.info("Starting task monitoring", extra={"task_id": validated_id, "interval": duration})
+    console.print(f"Monitoring task {validated_id}")
+    try:
+        while True:
+            task = get_task(manager, validated_id)
+            current_status_value = task.get("status")
+            if current_status_value is None:
+                current_status = "unknown"
+            else:
+                current_status = str(current_status_value)
+            timestamp_value = datetime.now().astimezone()
+            timestamp_text = timestamp_value.strftime("%Y-%m-%d %H:%M:%S %Z")
+            message_text = _format_monitor_message(timestamp_text, current_status, previous_status)
+            console.print(message_text)
+            LOGGER.info(
+                "Task status polled",
+                extra={
+                    "task_id": validated_id,
+                    "status": current_status,
+                    "previous_status": previous_status,
+                },
+            )
+            previous_status = current_status
+            if current_status == "completed":
+                completion_time = datetime.now().astimezone()
+                completion_text = completion_time.strftime("%Y-%m-%d %H:%M:%S %Z")
+                console.print(f"[{completion_text}] Task {validated_id} completed.")
+                LOGGER.info("Task completed during monitoring", extra={"task_id": validated_id})
+                break
+            _sleep(duration)
+    except KeyboardInterrupt:
+        console.print("Monitoring stopped by user.")
+        LOGGER.info("Monitoring interrupted by user", extra={"task_id": validated_id})
+
+
 def approve_plan(manager: Dict[str, Any], task_id: str) -> bool:
     """Approve a plan via MCP and update task status.
 
@@ -308,6 +366,53 @@ def send_message(manager: Dict[str, Any], task_id: str, message: str) -> bool:
     return True
 
 
+
+
+def resume_task(manager: Dict[str, Any], task_id: str) -> bool:
+    """Resume a paused task via MCP and update local storage."""
+
+    validated_id = _validate_task_identifier(task_id)
+    mcp_client = manager.get("mcp_client")
+    if mcp_client is None:
+        raise ValueError("MCP client is missing")
+    storage_manager = manager.get("storage")
+    if storage_manager is None:
+        raise ValueError("Storage manager is missing")
+    existing_task = storage.get_task(storage_manager, validated_id)
+    normalized_task = models.jules_task_from_dict(existing_task)
+    current_status = normalized_task.get("status")
+    if current_status != "paused":
+        raise ValueError("Task must be paused to resume")
+    payload = {"taskId": validated_id}
+    LOGGER.info("Resuming task via MCP", extra=payload)
+    try:
+        response = _invoke_mcp_tool(mcp_client, "jules_resume_task", payload)
+    except Exception as error:  # noqa: BLE001
+        LOGGER.error("MCP invocation failed", extra={"task_id": validated_id})
+        raise RuntimeError("Failed to resume task via MCP") from error
+    text_payload = _extract_response_text(response)
+    try:
+        raw_data = json.loads(text_payload)
+    except json.JSONDecodeError as error:
+        raise ValueError("Unable to parse resume payload") from error
+    if not isinstance(raw_data, dict):
+        raise ValueError("Resume payload must be a dictionary")
+    success_value = raw_data.get("success")
+    if success_value is False:
+        return False
+    if raw_data.get("error"):
+        message_text = str(raw_data.get("error"))
+        raise RuntimeError(f"MCP task resume failed: {message_text}")
+    if success_value is None:
+        raise ValueError("Resume payload missing success indicator")
+    if success_value is not True:
+        raise ValueError("Unexpected success value in resume payload")
+    normalized_task["status"] = "in_progress"
+    normalized_task["updated_at"] = datetime.now().astimezone()
+    serialized_task = models.jules_task_to_dict(normalized_task)
+    storage.save_task(storage_manager, serialized_task)
+    return True
+
 def _validate_repository(repository: str) -> str:
     if repository is None:
         raise ValueError("Repository is required")
@@ -339,6 +444,32 @@ def _normalize_branch(branch: Optional[str]) -> str:
         if character not in allowed:
             raise ValueError("Branch contains invalid characters")
     return stripped
+
+
+def _validate_monitor_interval(interval: Any) -> float:
+    """Validate monitoring interval ensuring it is a positive number."""
+
+    if interval is None:
+        raise ValueError("Interval is required")
+    if not isinstance(interval, (int, float)):
+        raise TypeError("Interval must be numeric")
+    if interval <= 0:
+        raise ValueError("Interval must be greater than zero")
+    duration = float(interval)
+    return duration
+
+
+def _format_monitor_message(timestamp: str, status: str, previous_status: Optional[str]) -> str:
+    """Build a human readable status update message."""
+
+    if previous_status is None:
+        message = f"[{timestamp}] Status: {status}"
+        return message
+    if status != previous_status:
+        message = f"[{timestamp}] Status changed to {status}"
+        return message
+    message = f"[{timestamp}] Status remains {status}"
+    return message
 
 
 def create_task(

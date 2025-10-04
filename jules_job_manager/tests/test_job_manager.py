@@ -2,6 +2,7 @@
 
 import json
 from datetime import datetime
+from types import SimpleNamespace
 from typing import Dict, List
 
 import pytest
@@ -531,3 +532,214 @@ def test_approve_plan_requires_valid_response(tmp_path) -> None:
     manager = create_manager_with_storage(storage_manager, stub_client)
     with pytest.raises(ValueError):
         job_manager.approve_plan(manager, "task-46")
+
+
+def test_resume_task_invokes_mcp_tool(tmp_path) -> None:
+    storage_manager = create_storage_with_existing_task(tmp_path, "task-50", status="paused")
+
+    def responder(name: str, arguments: Dict[str, object]):
+        payload = json.dumps({"success": True})
+        return {"content": [{"type": "text", "text": payload}]}
+
+    stub_client = create_stub_mcp_client(responder)
+    manager = create_manager_with_storage(storage_manager, stub_client)
+    result = job_manager.resume_task(manager, "task-50")
+    assert result is True
+    assert len(stub_client["calls"]) == 1
+    call = stub_client["calls"][0]
+    assert call["name"] == "jules_resume_task"
+    assert call["arguments"] == {"taskId": "task-50"}
+
+
+def test_resume_task_updates_status(tmp_path) -> None:
+    storage_manager = create_storage_with_existing_task(tmp_path, "task-51", status="paused")
+
+    def responder(name: str, arguments: Dict[str, object]):
+        payload = json.dumps({"success": True})
+        return {"content": [{"type": "text", "text": payload}]}
+
+    stub_client = create_stub_mcp_client(responder)
+    manager = create_manager_with_storage(storage_manager, stub_client)
+    job_manager.resume_task(manager, "task-51")
+    stored = storage.get_task(storage_manager, "task-51")
+    assert stored["status"] == "in_progress"
+
+
+def test_resume_task_requires_paused_status(tmp_path) -> None:
+    storage_manager = create_storage_with_existing_task(tmp_path, "task-52", status="pending")
+    manager = create_manager_with_storage(storage_manager)
+    with pytest.raises(ValueError):
+        job_manager.resume_task(manager, "task-52")
+
+
+def test_resume_task_handles_failure_response(tmp_path) -> None:
+    storage_manager = create_storage_with_existing_task(tmp_path, "task-53", status="paused")
+
+    def responder(name: str, arguments: Dict[str, object]):
+        payload = json.dumps({"success": False})
+        return {"content": [{"type": "text", "text": payload}]}
+
+    stub_client = create_stub_mcp_client(responder)
+    manager = create_manager_with_storage(storage_manager, stub_client)
+    result = job_manager.resume_task(manager, "task-53")
+    assert result is False
+    stored = storage.get_task(storage_manager, "task-53")
+    assert stored["status"] == "paused"
+
+
+def test_resume_task_handles_error_payload(tmp_path) -> None:
+    storage_manager = create_storage_with_existing_task(tmp_path, "task-54", status="paused")
+
+    def responder(name: str, arguments: Dict[str, object]):
+        payload = json.dumps({"error": "resume_failed"})
+        return {"content": [{"type": "text", "text": payload}]}
+
+    stub_client = create_stub_mcp_client(responder)
+    manager = create_manager_with_storage(storage_manager, stub_client)
+    with pytest.raises(RuntimeError):
+        job_manager.resume_task(manager, "task-54")
+
+
+def test_resume_task_validates_task_identifier(tmp_path) -> None:
+    storage_manager = create_storage_with_existing_task(tmp_path, "task-55", status="paused")
+    manager = create_manager_with_storage(storage_manager)
+    with pytest.raises(ValueError):
+        job_manager.resume_task(manager, " ")
+
+
+def test_resume_task_requires_existing_task(tmp_path) -> None:
+    storage_manager = create_storage_manager_with_tasks(tmp_path, [])
+    manager = create_manager_with_storage(storage_manager)
+    with pytest.raises(KeyError):
+        job_manager.resume_task(manager, "missing")
+
+
+def test_resume_task_requires_valid_response(tmp_path) -> None:
+    storage_manager = create_storage_with_existing_task(tmp_path, "task-56", status="paused")
+
+    def responder(name: str, arguments: Dict[str, object]):
+        return {"content": [{"type": "text", "text": "not-json"}]}
+
+    stub_client = create_stub_mcp_client(responder)
+    manager = create_manager_with_storage(storage_manager, stub_client)
+    with pytest.raises(ValueError):
+        job_manager.resume_task(manager, "task-56")
+
+
+def test_monitor_task_polls_until_completed(monkeypatch) -> None:
+    statuses: list = []
+    statuses.append("pending")
+    statuses.append("in_progress")
+    statuses.append("completed")
+    calls: list = []
+
+    def fake_get_task(manager, task_identifier):
+        calls.append(task_identifier)
+        if statuses:
+            current_status = statuses.pop(0)
+        else:
+            current_status = "completed"
+        timestamp = datetime.now().astimezone()
+        task = models.create_jules_task(
+            task_identifier,
+            "Sample Title",
+            "Sample Description",
+            "owner/repo",
+            "main",
+            current_status,
+            timestamp,
+            timestamp,
+            "https://example.com/task",
+        )
+        return task
+
+    sleeps: list = []
+
+    def fake_sleep(interval):
+        sleeps.append(interval)
+
+    messages: list = []
+
+    def create_console_stub():
+        def record_message(message):
+            messages.append(message)
+
+        console = SimpleNamespace(print=record_message)
+        return console
+
+    original_manager = job_manager.create_job_manager(create_dummy_mcp_client(), create_dummy_storage())
+    monkeypatch.setattr(job_manager, "get_task", fake_get_task)
+    monkeypatch.setattr(job_manager, "_sleep", fake_sleep)
+    monkeypatch.setattr(job_manager, "_create_console", create_console_stub)
+    job_manager.monitor_task(original_manager, "task-200", interval=2)
+    assert len(calls) == 3
+    assert len(sleeps) == 2
+    assert sleeps[0] == 2
+    assert sleeps[1] == 2
+    assert messages
+    last_index = len(messages) - 1
+    assert "completed" in str(messages[last_index])
+
+
+def test_monitor_task_handles_keyboard_interrupt(monkeypatch) -> None:
+    call_counter: dict = {"count": 0}
+
+    def fake_get_task(manager, task_identifier):
+        call_counter["count"] = call_counter["count"] + 1
+        timestamp = datetime.now().astimezone()
+        task = models.create_jules_task(
+            task_identifier,
+            "Sample Title",
+            "Sample Description",
+            "owner/repo",
+            "main",
+            "in_progress",
+            timestamp,
+            timestamp,
+            "https://example.com/task",
+        )
+        return task
+
+    def fake_sleep(interval):
+        raise KeyboardInterrupt()
+
+    messages: list = []
+
+    def create_console_stub():
+        def record_message(message):
+            messages.append(message)
+
+        console = SimpleNamespace(print=record_message)
+        return console
+
+    original_manager = job_manager.create_job_manager(create_dummy_mcp_client(), create_dummy_storage())
+    monkeypatch.setattr(job_manager, "get_task", fake_get_task)
+    monkeypatch.setattr(job_manager, "_sleep", fake_sleep)
+    monkeypatch.setattr(job_manager, "_create_console", create_console_stub)
+    job_manager.monitor_task(original_manager, "task-201", interval=3)
+    assert call_counter["count"] == 1
+    assert messages
+    last_index = len(messages) - 1
+    assert "Monitoring stopped" in str(messages[last_index])
+
+
+def test_monitor_task_raises_for_missing_task(monkeypatch) -> None:
+    def fake_get_task(manager, task_identifier):
+        raise KeyError("missing")
+
+    def fake_sleep(interval):
+        return None
+
+    def create_console_stub():
+        def record_message(message):
+            return None
+
+        console = SimpleNamespace(print=record_message)
+        return console
+
+    original_manager = job_manager.create_job_manager(create_dummy_mcp_client(), create_dummy_storage())
+    monkeypatch.setattr(job_manager, "get_task", fake_get_task)
+    monkeypatch.setattr(job_manager, "_sleep", fake_sleep)
+    monkeypatch.setattr(job_manager, "_create_console", create_console_stub)
+    with pytest.raises(KeyError):
+        job_manager.monitor_task(original_manager, "task-202", interval=4)
