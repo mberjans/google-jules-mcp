@@ -344,42 +344,42 @@ This checklist breaks down each ticket into tiny, testable tasks following Test-
 - [x] JJM-010-T20: Run tests (should pass - Green phase): `pytest tests/test_job_manager.py::test_send_message -v`
 - [x] JJM-010-T21: Add docstring to send_message method
 - [x] JJM-010-T22: Add type hints
-- [ ] JJM-010-T23: Add logging for message operations
-- [ ] JJM-010-T24: Run tests again to verify refactoring
-- [ ] JJM-010-T25: Check code coverage for send_message
-- [ ] JJM-010-T26: Commit changes: "JJM-010: Implement send_message with tests"
-- [ ] JJM-010-T27: Push to repository
+- [x] JJM-010-T23: Add logging for message operations
+- [x] JJM-010-T24: Run tests again to verify refactoring
+- [x] JJM-010-T25: Check code coverage for send_message
+- [x] JJM-010-T26: Commit changes: "JJM-010: Implement send_message with tests"
+- [x] JJM-010-T27: Push to repository
 
 ---
 
 #### JJM-011: Job Manager - Approve Plan
 **TDD: Write tests for approve_plan functionality**
 
-- [ ] JJM-011-T01: Write test for `approve_plan()` method in test_job_manager.py
-- [ ] JJM-011-T02: Write test for approving plan with task_id
-- [ ] JJM-011-T03: Write test for MCP tool invocation (jules_approve_plan)
-- [ ] JJM-011-T04: Write test for success response (returns True)
-- [ ] JJM-011-T05: Write test for failure response (returns False)
-- [ ] JJM-011-T06: Write test for task status update to "in_progress"
-- [ ] JJM-011-T07: Write test for task not in approval state error
-- [ ] JJM-011-T08: Write test for approval failure
-- [ ] JJM-011-T09: Run tests (should fail - Red phase): `pytest tests/test_job_manager.py::test_approve -v`
-- [ ] JJM-011-T10: Implement `approve_plan()` method in JobManager
-- [ ] JJM-011-T11: Add parameter: task_id
-- [ ] JJM-011-T12: Call mcp_client.invoke_tool("jules_approve_plan", {"taskId": task_id})
-- [ ] JJM-011-T13: Parse response for success/failure
-- [ ] JJM-011-T14: If successful, get task from storage
-- [ ] JJM-011-T15: Update task.status to "in_progress"
-- [ ] JJM-011-T16: Save updated task to storage
-- [ ] JJM-011-T17: Return boolean success status
-- [ ] JJM-011-T18: Add error handling for invalid state
-- [ ] JJM-011-T19: Add error handling for approval failures
-- [ ] JJM-011-T20: Run tests (should pass - Green phase): `pytest tests/test_job_manager.py::test_approve -v`
-- [ ] JJM-011-T21: Add docstring to approve_plan method
-- [ ] JJM-011-T22: Add type hints
-- [ ] JJM-011-T23: Add logging for approval operations
-- [ ] JJM-011-T24: Run tests again to verify refactoring
-- [ ] JJM-011-T25: Check code coverage for approve_plan
+- [x] JJM-011-T01: Write test for `approve_plan()` method in test_job_manager.py
+- [x] JJM-011-T02: Write test for approving plan with task_id
+- [x] JJM-011-T03: Write test for MCP tool invocation (jules_approve_plan)
+- [x] JJM-011-T04: Write test for success response (returns True)
+- [x] JJM-011-T05: Write test for failure response (returns False)
+- [x] JJM-011-T06: Write test for task status update to "in_progress"
+- [x] JJM-011-T07: Write test for task not in approval state error
+- [x] JJM-011-T08: Write test for approval failure
+- [x] JJM-011-T09: Run tests (should fail - Red phase): `pytest tests/test_job_manager.py::test_approve -v`
+- [x] JJM-011-T10: Implement `approve_plan()` method in JobManager
+- [x] JJM-011-T11: Add parameter: task_id
+- [x] JJM-011-T12: Call mcp_client.invoke_tool("jules_approve_plan", {"taskId": task_id})
+- [x] JJM-011-T13: Parse response for success/failure
+- [x] JJM-011-T14: If successful, get task from storage
+- [x] JJM-011-T15: Update task.status to "in_progress"
+- [x] JJM-011-T16: Save updated task to storage
+- [x] JJM-011-T17: Return boolean success status
+- [x] JJM-011-T18: Add error handling for invalid state
+- [x] JJM-011-T19: Add error handling for approval failures
+- [x] JJM-011-T20: Run tests (should pass - Green phase): `pytest tests/test_job_manager.py::test_approve -v`
+- [x] JJM-011-T21: Add docstring to approve_plan method
+- [x] JJM-011-T22: Add type hints
+- [x] JJM-011-T23: Add logging for approval operations
+- [x] JJM-011-T24: Run tests again to verify refactoring
+- [x] JJM-011-T25: Check code coverage for approve_plan
 - [ ] JJM-011-T26: Commit changes: "JJM-011: Implement approve_plan with tests"
 - [ ] JJM-011-T27: Push to repository
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from src import models, storage
@@ -176,6 +177,65 @@ def get_task(manager: Dict[str, Any], task_id: str) -> Dict[str, object]:
     serialized_task = models.jules_task_to_dict(normalized_task)
     storage.save_task(storage_manager, serialized_task)
     return normalized_task
+
+
+def approve_plan(manager: Dict[str, Any], task_id: str) -> bool:
+    """Approve a plan via MCP and update task status.
+
+    Args:
+        manager: Job manager dictionary produced by ``create_job_manager``.
+        task_id: Identifier for the task awaiting approval.
+
+    Returns:
+        Boolean representing whether approval succeeded.
+
+    Raises:
+        ValueError: When dependencies are missing or task is not in approval state.
+        KeyError: If the task does not exist in storage.
+        RuntimeError: When MCP invocation fails or returns an error payload.
+    """
+
+    validated_id = _validate_task_identifier(task_id)
+    mcp_client = manager.get("mcp_client")
+    if mcp_client is None:
+        raise ValueError("MCP client is missing")
+    storage_manager = manager.get("storage")
+    if storage_manager is None:
+        raise ValueError("Storage manager is missing")
+    existing_task = storage.get_task(storage_manager, validated_id)
+    normalized_task = models.jules_task_from_dict(existing_task)
+    current_status = normalized_task.get("status")
+    if current_status != "waiting_approval":
+        raise ValueError("Task must be waiting for approval")
+    payload = {"taskId": validated_id}
+    LOGGER.info("Approving plan via MCP", extra=payload)
+    try:
+        response = _invoke_mcp_tool(mcp_client, "jules_approve_plan", payload)
+    except Exception as error:  # noqa: BLE001
+        LOGGER.error("MCP invocation failed", extra={"task_id": validated_id})
+        raise RuntimeError("Failed to approve plan via MCP") from error
+    text_payload = _extract_response_text(response)
+    try:
+        raw_data = json.loads(text_payload)
+    except json.JSONDecodeError as error:
+        raise ValueError("Unable to parse approval payload") from error
+    if not isinstance(raw_data, dict):
+        raise ValueError("Approval payload must be a dictionary")
+    success_value = raw_data.get("success")
+    if success_value is False:
+        return False
+    if raw_data.get("error"):
+        message_text = str(raw_data.get("error"))
+        raise RuntimeError(f"MCP plan approval failed: {message_text}")
+    if success_value is None:
+        raise ValueError("Approval payload missing success indicator")
+    if success_value is not True:
+        raise ValueError("Unexpected success value in approval payload")
+    normalized_task["status"] = "in_progress"
+    normalized_task["updated_at"] = datetime.now().astimezone()
+    serialized_task = models.jules_task_to_dict(normalized_task)
+    storage.save_task(storage_manager, serialized_task)
+    return True
 
 
 def _validate_message_content(message: str) -> str:

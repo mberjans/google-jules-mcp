@@ -329,8 +329,8 @@ def test_create_task_handles_mcp_failure(tmp_path) -> None:
         job_manager.create_task(manager, "Example", "owner/repo")
 
 
-def create_storage_with_existing_task(tmp_path, task_id="task-30"):
-    task = create_serialized_task(task_id, "in_progress")
+def create_storage_with_existing_task(tmp_path, task_id="task-30", status="in_progress"):
+    task = create_serialized_task(task_id, status)
     storage_manager = create_storage_manager_with_tasks(tmp_path, [task])
     return storage_manager
 
@@ -439,3 +439,95 @@ def test_send_message_handles_error_payload(tmp_path) -> None:
     manager = create_manager_with_storage(storage_manager, stub_client)
     with pytest.raises(RuntimeError):
         job_manager.send_message(manager, "task-37", "Hello")
+
+
+def test_approve_plan_invokes_mcp_tool(tmp_path) -> None:
+    storage_manager = create_storage_with_existing_task(tmp_path, "task-40", status="waiting_approval")
+
+    def responder(name: str, arguments: Dict[str, object]):
+        payload = json.dumps({"success": True})
+        return {"content": [{"type": "text", "text": payload}]}
+
+    stub_client = create_stub_mcp_client(responder)
+    manager = create_manager_with_storage(storage_manager, stub_client)
+    result = job_manager.approve_plan(manager, "task-40")
+    assert result is True
+    assert len(stub_client["calls"]) == 1
+    call = stub_client["calls"][0]
+    assert call["name"] == "jules_approve_plan"
+    assert call["arguments"] == {"taskId": "task-40"}
+
+
+def test_approve_plan_updates_status(tmp_path) -> None:
+    storage_manager = create_storage_with_existing_task(tmp_path, "task-41", status="waiting_approval")
+
+    def responder(name: str, arguments: Dict[str, object]):
+        payload = json.dumps({"success": True})
+        return {"content": [{"type": "text", "text": payload}]}
+
+    stub_client = create_stub_mcp_client(responder)
+    manager = create_manager_with_storage(storage_manager, stub_client)
+    job_manager.approve_plan(manager, "task-41")
+    stored = storage.get_task(storage_manager, "task-41")
+    assert stored["status"] == "in_progress"
+
+
+def test_approve_plan_requires_waiting_status(tmp_path) -> None:
+    storage_manager = create_storage_with_existing_task(tmp_path, "task-42", status="pending")
+    manager = create_manager_with_storage(storage_manager)
+    with pytest.raises(ValueError):
+        job_manager.approve_plan(manager, "task-42")
+
+
+def test_approve_plan_handles_failure_response(tmp_path) -> None:
+    storage_manager = create_storage_with_existing_task(tmp_path, "task-43", status="waiting_approval")
+
+    def responder(name: str, arguments: Dict[str, object]):
+        payload = json.dumps({"success": False})
+        return {"content": [{"type": "text", "text": payload}]}
+
+    stub_client = create_stub_mcp_client(responder)
+    manager = create_manager_with_storage(storage_manager, stub_client)
+    result = job_manager.approve_plan(manager, "task-43")
+    assert result is False
+    stored = storage.get_task(storage_manager, "task-43")
+    assert stored["status"] == "waiting_approval"
+
+
+def test_approve_plan_handles_error_payload(tmp_path) -> None:
+    storage_manager = create_storage_with_existing_task(tmp_path, "task-44", status="waiting_approval")
+
+    def responder(name: str, arguments: Dict[str, object]):
+        payload = json.dumps({"error": "approval_failed"})
+        return {"content": [{"type": "text", "text": payload}]}
+
+    stub_client = create_stub_mcp_client(responder)
+    manager = create_manager_with_storage(storage_manager, stub_client)
+    with pytest.raises(RuntimeError):
+        job_manager.approve_plan(manager, "task-44")
+
+
+def test_approve_plan_validates_task_identifier(tmp_path) -> None:
+    storage_manager = create_storage_with_existing_task(tmp_path, "task-45", status="waiting_approval")
+    manager = create_manager_with_storage(storage_manager)
+    with pytest.raises(ValueError):
+        job_manager.approve_plan(manager, " ")
+
+
+def test_approve_plan_requires_existing_task(tmp_path) -> None:
+    storage_manager = create_storage_manager_with_tasks(tmp_path, [])
+    manager = create_manager_with_storage(storage_manager)
+    with pytest.raises(KeyError):
+        job_manager.approve_plan(manager, "missing")
+
+
+def test_approve_plan_requires_valid_response(tmp_path) -> None:
+    storage_manager = create_storage_with_existing_task(tmp_path, "task-46", status="waiting_approval")
+
+    def responder(name: str, arguments: Dict[str, object]):
+        return {"content": [{"type": "text", "text": "not-json"}]}
+
+    stub_client = create_stub_mcp_client(responder)
+    manager = create_manager_with_storage(storage_manager, stub_client)
+    with pytest.raises(ValueError):
+        job_manager.approve_plan(manager, "task-46")
