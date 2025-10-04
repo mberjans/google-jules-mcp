@@ -176,3 +176,94 @@ def get_task(manager: Dict[str, Any], task_id: str) -> Dict[str, object]:
     serialized_task = models.jules_task_to_dict(normalized_task)
     storage.save_task(storage_manager, serialized_task)
     return normalized_task
+
+
+def _validate_repository(repository: str) -> str:
+    if repository is None:
+        raise ValueError("Repository is required")
+    stripped = repository.strip()
+    if not stripped:
+        raise ValueError("Repository cannot be blank")
+    if "/" not in stripped:
+        raise ValueError("Repository must include owner and name")
+    return stripped
+
+
+def _validate_description(description: str) -> str:
+    if description is None:
+        raise ValueError("Task description is required")
+    stripped = description.strip()
+    if not stripped:
+        raise ValueError("Task description cannot be blank")
+    return stripped
+
+
+def _normalize_branch(branch: Optional[str]) -> str:
+    if branch is None:
+        return "main"
+    stripped = branch.strip()
+    if not stripped:
+        return "main"
+    allowed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_/"
+    for character in stripped:
+        if character not in allowed:
+            raise ValueError("Branch contains invalid characters")
+    return stripped
+
+
+def create_task(
+    manager: Dict[str, Any],
+    description: str,
+    repository: str,
+    branch: Optional[str] = None,
+) -> Dict[str, object]:
+    """Create a new task via MCP and persist the returned task locally.
+
+    Args:
+        manager: Job manager dictionary produced by ``create_job_manager``.
+        description: Text describing the work item to schedule.
+        repository: Target repository in ``owner/name`` format.
+        branch: Optional branch name (defaults to ``main``).
+
+    Returns:
+        Normalized Jules task dictionary created by MCP.
+
+    Raises:
+        ValueError: When inputs or dependencies are invalid.
+        RuntimeError: When MCP invocation fails or returns an error payload.
+    """
+
+    validated_description = _validate_description(description)
+    validated_repository = _validate_repository(repository)
+    normalized_branch = _normalize_branch(branch)
+    mcp_client = manager.get("mcp_client")
+    if mcp_client is None:
+        raise ValueError("MCP client is missing")
+    storage_manager = manager.get("storage")
+    if storage_manager is None:
+        raise ValueError("Storage manager is missing")
+    payload = {
+        "description": validated_description,
+        "repository": validated_repository,
+        "branch": normalized_branch,
+    }
+    LOGGER.info("Creating task via MCP", extra=payload)
+    try:
+        response = _invoke_mcp_tool(mcp_client, "jules_create_task", payload)
+    except Exception as error:  # noqa: BLE001
+        LOGGER.error("MCP invocation failed", extra=payload)
+        raise RuntimeError("Failed to create task via MCP") from error
+    text_payload = _extract_response_text(response)
+    try:
+        raw_data = json.loads(text_payload)
+    except json.JSONDecodeError as error:
+        raise ValueError("Unable to parse task payload") from error
+    if isinstance(raw_data, dict) and raw_data.get("error"):
+        message = str(raw_data.get("error"))
+        raise RuntimeError(f"MCP task creation failed: {message}")
+    if not isinstance(raw_data, dict):
+        raise ValueError("Task payload must be a dictionary")
+    normalized_task = models.jules_task_from_dict(raw_data)
+    serialized_task = models.jules_task_to_dict(normalized_task)
+    storage.save_task(storage_manager, serialized_task)
+    return normalized_task

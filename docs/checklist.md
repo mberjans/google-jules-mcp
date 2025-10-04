@@ -277,41 +277,41 @@ This checklist breaks down each ticket into tiny, testable tasks following Test-
 - [x] JJM-008-T24: Add logging for operations
 - [x] JJM-008-T25: Run tests again to verify refactoring
 - [x] JJM-008-T26: Check code coverage for get_task
-- [ ] JJM-008-T27: Commit changes: "JJM-008: Implement get_task with tests"
-- [ ] JJM-008-T28: Push to repository
+- [x] JJM-008-T27: Commit changes: "JJM-008: Implement get_task with tests"
+- [x] JJM-008-T28: Push to repository
 
 ---
 
 #### JJM-009: Job Manager - Create Task
 **TDD: Write tests for create_task functionality**
 
-- [ ] JJM-009-T01: Write test for `create_task()` method in test_job_manager.py
-- [ ] JJM-009-T02: Write test for creating task with description and repository
-- [ ] JJM-009-T03: Write test for optional branch parameter
-- [ ] JJM-009-T04: Write test for MCP tool invocation (jules_create_task)
-- [ ] JJM-009-T05: Write test for response parsing to extract task ID
-- [ ] JJM-009-T06: Write test for JulesTask object creation
-- [ ] JJM-009-T07: Write test for storage save after creation
-- [ ] JJM-009-T08: Write test for repository format validation
-- [ ] JJM-009-T09: Write test for invalid repository format error
-- [ ] JJM-009-T10: Write test for task creation failure
-- [ ] JJM-009-T11: Run tests (should fail - Red phase): `pytest tests/test_job_manager.py::test_create -v`
-- [ ] JJM-009-T12: Implement `create_task()` method in JobManager
-- [ ] JJM-009-T13: Add parameters: description, repository, branch="main"
-- [ ] JJM-009-T14: Validate repository format with regex
-- [ ] JJM-009-T15: Call mcp_client.invoke_tool("jules_create_task", args)
-- [ ] JJM-009-T16: Parse response to extract task ID and URL
-- [ ] JJM-009-T17: Create JulesTask object with initial status "pending"
-- [ ] JJM-009-T18: Call storage.save_task() to persist
-- [ ] JJM-009-T19: Return JulesTask object
-- [ ] JJM-009-T20: Add error handling for invalid repository format
-- [ ] JJM-009-T21: Add error handling for creation failures
-- [ ] JJM-009-T22: Run tests (should pass - Green phase): `pytest tests/test_job_manager.py::test_create -v`
-- [ ] JJM-009-T23: Add docstring to create_task method
-- [ ] JJM-009-T24: Add type hints
-- [ ] JJM-009-T25: Add logging for task creation
-- [ ] JJM-009-T26: Run tests again to verify refactoring
-- [ ] JJM-009-T27: Check code coverage for create_task
+- [x] JJM-009-T01: Write test for `create_task()` method in test_job_manager.py
+- [x] JJM-009-T02: Write test for creating task with description and repository
+- [x] JJM-009-T03: Write test for optional branch parameter
+- [x] JJM-009-T04: Write test for MCP tool invocation (jules_create_task)
+- [x] JJM-009-T05: Write test for response parsing to extract task ID
+- [x] JJM-009-T06: Write test for JulesTask object creation
+- [x] JJM-009-T07: Write test for storage save after creation
+- [x] JJM-009-T08: Write test for repository format validation
+- [x] JJM-009-T09: Write test for invalid repository format error
+- [x] JJM-009-T10: Write test for task creation failure
+- [x] JJM-009-T11: Run tests (should fail - Red phase): `pytest tests/test_job_manager.py::test_create -v`
+- [x] JJM-009-T12: Implement `create_task()` method in JobManager
+- [x] JJM-009-T13: Add parameters: description, repository, branch="main"
+- [x] JJM-009-T14: Validate repository format with regex
+- [x] JJM-009-T15: Call mcp_client.invoke_tool("jules_create_task", args)
+- [x] JJM-009-T16: Parse response to extract task ID and URL
+- [x] JJM-009-T17: Create JulesTask object with initial status "pending"
+- [x] JJM-009-T18: Call storage.save_task() to persist
+- [x] JJM-009-T19: Return JulesTask object
+- [x] JJM-009-T20: Add error handling for invalid repository format
+- [x] JJM-009-T21: Add error handling for creation failures
+- [x] JJM-009-T22: Run tests (should pass - Green phase): `pytest tests/test_job_manager.py::test_create -v`
+- [x] JJM-009-T23: Add docstring to create_task method
+- [x] JJM-009-T24: Add type hints
+- [x] JJM-009-T25: Add logging for task creation
+- [x] JJM-009-T26: Run tests again to verify refactoring
+- [x] JJM-009-T27: Check code coverage for create_task
 - [ ] JJM-009-T28: Commit changes: "JJM-009: Implement create_task with tests"
 - [ ] JJM-009-T29: Push to repository
 

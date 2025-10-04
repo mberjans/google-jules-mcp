@@ -253,3 +253,102 @@ def test_get_task_requires_valid_response(tmp_path) -> None:
     manager = create_manager_with_storage(storage_manager, stub_client)
     with pytest.raises(ValueError):
         job_manager.get_task(manager, "task-13")
+
+
+def test_create_task_invokes_mcp_tool(tmp_path) -> None:
+    raw_task = create_serialized_task("task-20", "pending")
+
+    def responder(name: str, arguments: Dict[str, object]):
+        payload = json.dumps(raw_task)
+        response = {"content": [{"type": "text", "text": payload}]}
+        return response
+
+    stub_client = create_stub_mcp_client(responder)
+    storage_manager = create_storage_manager_with_tasks(tmp_path, [])
+    manager = create_manager_with_storage(storage_manager, stub_client)
+    result = job_manager.create_task(manager, "Example task", "owner/repo", branch="dev")
+    assert result["id"] == "task-20"
+    assert len(stub_client["calls"]) == 1
+    call = stub_client["calls"][0]
+    assert call["name"] == "jules_create_task"
+    assert call["arguments"] == {
+        "description": "Example task",
+        "repository": "owner/repo",
+        "branch": "dev",
+    }
+
+
+def test_create_task_defaults_branch(tmp_path) -> None:
+    raw_task = create_serialized_task("task-21", "pending")
+
+    def responder(name: str, arguments: Dict[str, object]):
+        payload = json.dumps(raw_task)
+        return {"content": [{"type": "text", "text": payload}]}
+
+    stub_client = create_stub_mcp_client(responder)
+    storage_manager = create_storage_manager_with_tasks(tmp_path, [])
+    manager = create_manager_with_storage(storage_manager, stub_client)
+    job_manager.create_task(manager, "Example", "owner/repo")
+    call = stub_client["calls"][0]
+    assert call["arguments"]["branch"] == "main"
+
+
+def test_create_task_updates_storage(tmp_path) -> None:
+    raw_task = create_serialized_task("task-22", "in_progress")
+
+    def responder(name: str, arguments: Dict[str, object]):
+        payload = json.dumps(raw_task)
+        return {"content": [{"type": "text", "text": payload}]}
+
+    stub_client = create_stub_mcp_client(responder)
+    storage_manager = create_storage_manager_with_tasks(tmp_path, [])
+    manager = create_manager_with_storage(storage_manager, stub_client)
+    job_manager.create_task(manager, "Example", "owner/repo")
+    saved = storage.get_task(storage_manager, "task-22")
+    assert saved["status"] == "in_progress"
+
+
+def test_create_task_validates_inputs(tmp_path) -> None:
+    storage_manager = create_storage_manager_with_tasks(tmp_path, [])
+    manager = create_manager_with_storage(storage_manager)
+    with pytest.raises(ValueError):
+        job_manager.create_task(manager, "", "owner/repo")
+    with pytest.raises(ValueError):
+        job_manager.create_task(manager, "Example", " ")
+
+
+def test_create_task_handles_mcp_failure(tmp_path) -> None:
+
+    def responder(name: str, arguments: Dict[str, object]):
+        raise RuntimeError("mcp failure")
+
+    stub_client = create_stub_mcp_client(responder)
+    storage_manager = create_storage_manager_with_tasks(tmp_path, [])
+    manager = create_manager_with_storage(storage_manager, stub_client)
+    with pytest.raises(RuntimeError):
+        job_manager.create_task(manager, "Example", "owner/repo")
+
+
+def test_create_task_requires_valid_response(tmp_path) -> None:
+
+    def responder(name: str, arguments: Dict[str, object]):
+        return {"content": [{"type": "text", "text": "not-json"}]}
+
+    stub_client = create_stub_mcp_client(responder)
+    storage_manager = create_storage_manager_with_tasks(tmp_path, [])
+    manager = create_manager_with_storage(storage_manager, stub_client)
+    with pytest.raises(ValueError):
+        job_manager.create_task(manager, "Example", "owner/repo")
+
+
+def test_create_task_handles_error_payload(tmp_path) -> None:
+
+    def responder(name: str, arguments: Dict[str, object]):
+        payload = json.dumps({"error": "creation_failed"})
+        return {"content": [{"type": "text", "text": payload}]}
+
+    stub_client = create_stub_mcp_client(responder)
+    storage_manager = create_storage_manager_with_tasks(tmp_path, [])
+    manager = create_manager_with_storage(storage_manager, stub_client)
+    with pytest.raises(RuntimeError):
+        job_manager.create_task(manager, "Example", "owner/repo")
