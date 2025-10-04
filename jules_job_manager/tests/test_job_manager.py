@@ -329,26 +329,113 @@ def test_create_task_handles_mcp_failure(tmp_path) -> None:
         job_manager.create_task(manager, "Example", "owner/repo")
 
 
-def test_create_task_requires_valid_response(tmp_path) -> None:
+def create_storage_with_existing_task(tmp_path, task_id="task-30"):
+    task = create_serialized_task(task_id, "in_progress")
+    storage_manager = create_storage_manager_with_tasks(tmp_path, [task])
+    return storage_manager
+
+
+def test_send_message_invokes_mcp_tool(tmp_path) -> None:
+    storage_manager = create_storage_with_existing_task(tmp_path, "task-30")
+
+    def responder(name: str, arguments: Dict[str, object]):
+        payload = json.dumps({"success": True})
+        return {"content": [{"type": "text", "text": payload}]}
+
+    stub_client = create_stub_mcp_client(responder)
+    manager = create_manager_with_storage(storage_manager, stub_client)
+    result = job_manager.send_message(manager, "task-30", "Hello Jules")
+    assert result
+    assert len(stub_client["calls"]) == 1
+    call = stub_client["calls"][0]
+    assert call["name"] == "jules_send_message"
+    assert call["arguments"] == {"taskId": "task-30", "message": "Hello Jules"}
+
+
+def test_send_message_updates_chat_history(tmp_path) -> None:
+    storage_manager = create_storage_with_existing_task(tmp_path, "task-31")
+
+    def responder(name: str, arguments: Dict[str, object]):
+        payload = json.dumps({"success": True})
+        return {"content": [{"type": "text", "text": payload}]}
+
+    stub_client = create_stub_mcp_client(responder)
+    manager = create_manager_with_storage(storage_manager, stub_client)
+    job_manager.send_message(manager, "task-31", "Progress update")
+    stored = storage.get_task(storage_manager, "task-31")
+    history = stored.get("chat_history", [])
+    assert len(history) == 1
+    last = history[-1]
+    assert last["type"] == "user"
+    assert last["content"] == "Progress update"
+
+
+def test_send_message_validates_task_identifier(tmp_path) -> None:
+    storage_manager = create_storage_with_existing_task(tmp_path, "task-32")
+    manager = create_manager_with_storage(storage_manager)
+    with pytest.raises(ValueError):
+        job_manager.send_message(manager, " ", "Hello")
+
+
+def test_send_message_validates_message(tmp_path) -> None:
+    storage_manager = create_storage_with_existing_task(tmp_path, "task-33")
+    manager = create_manager_with_storage(storage_manager)
+    with pytest.raises(ValueError):
+        job_manager.send_message(manager, "task-33", " ")
+
+
+def test_send_message_requires_existing_task(tmp_path) -> None:
+    storage_manager = create_storage_manager_with_tasks(tmp_path, [])
+    manager = create_manager_with_storage(storage_manager)
+    with pytest.raises(KeyError):
+        job_manager.send_message(manager, "missing", "Hello")
+
+
+def test_send_message_handles_failure_response(tmp_path) -> None:
+    storage_manager = create_storage_with_existing_task(tmp_path, "task-34")
+
+    def responder(name: str, arguments: Dict[str, object]):
+        payload = json.dumps({"success": False, "error": "not sent"})
+        return {"content": [{"type": "text", "text": payload}]}
+
+    stub_client = create_stub_mcp_client(responder)
+    manager = create_manager_with_storage(storage_manager, stub_client)
+    result = job_manager.send_message(manager, "task-34", "Hello")
+    assert result is False
+
+
+def test_send_message_handles_mcp_exception(tmp_path) -> None:
+    storage_manager = create_storage_with_existing_task(tmp_path, "task-35")
+
+    def responder(name: str, arguments: Dict[str, object]):
+        raise RuntimeError("transport error")
+
+    stub_client = create_stub_mcp_client(responder)
+    manager = create_manager_with_storage(storage_manager, stub_client)
+    with pytest.raises(RuntimeError):
+        job_manager.send_message(manager, "task-35", "Hello")
+
+
+def test_send_message_requires_valid_response(tmp_path) -> None:
+    storage_manager = create_storage_with_existing_task(tmp_path, "task-36")
 
     def responder(name: str, arguments: Dict[str, object]):
         return {"content": [{"type": "text", "text": "not-json"}]}
 
     stub_client = create_stub_mcp_client(responder)
-    storage_manager = create_storage_manager_with_tasks(tmp_path, [])
     manager = create_manager_with_storage(storage_manager, stub_client)
     with pytest.raises(ValueError):
-        job_manager.create_task(manager, "Example", "owner/repo")
+        job_manager.send_message(manager, "task-36", "Hello")
 
 
-def test_create_task_handles_error_payload(tmp_path) -> None:
+def test_send_message_handles_error_payload(tmp_path) -> None:
+    storage_manager = create_storage_with_existing_task(tmp_path, "task-37")
 
     def responder(name: str, arguments: Dict[str, object]):
-        payload = json.dumps({"error": "creation_failed"})
+        payload = json.dumps({"error": "delivery_failed"})
         return {"content": [{"type": "text", "text": payload}]}
 
     stub_client = create_stub_mcp_client(responder)
-    storage_manager = create_storage_manager_with_tasks(tmp_path, [])
     manager = create_manager_with_storage(storage_manager, stub_client)
     with pytest.raises(RuntimeError):
-        job_manager.create_task(manager, "Example", "owner/repo")
+        job_manager.send_message(manager, "task-37", "Hello")

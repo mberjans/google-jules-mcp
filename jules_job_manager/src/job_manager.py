@@ -178,6 +178,76 @@ def get_task(manager: Dict[str, Any], task_id: str) -> Dict[str, object]:
     return normalized_task
 
 
+def _validate_message_content(message: str) -> str:
+    if message is None:
+        raise ValueError("Message text is required")
+    stripped = message.strip()
+    if not stripped:
+        raise ValueError("Message text cannot be blank")
+    return stripped
+
+
+def send_message(manager: Dict[str, Any], task_id: str, message: str) -> bool:
+    """Send a chat message through MCP and record it in storage.
+
+    Args:
+        manager: Job manager dictionary produced by ``create_job_manager``.
+        task_id: Identifier of the target task.
+        message: Message content to deliver.
+
+    Returns:
+        Boolean indicating whether the MCP server reported success.
+
+    Raises:
+        ValueError: When inputs or dependencies are invalid, or response is malformed.
+        KeyError: If the referenced task does not exist in storage.
+        RuntimeError: When MCP invocation fails or reports an error payload.
+    """
+
+    validated_id = _validate_task_identifier(task_id)
+    validated_message = _validate_message_content(message)
+    mcp_client = manager.get("mcp_client")
+    if mcp_client is None:
+        raise ValueError("MCP client is missing")
+    storage_manager = manager.get("storage")
+    if storage_manager is None:
+        raise ValueError("Storage manager is missing")
+    existing_task = storage.get_task(storage_manager, validated_id)
+    normalized_task = models.jules_task_from_dict(existing_task)
+    payload = {"taskId": validated_id, "message": validated_message}
+    LOGGER.info("Sending message via MCP", extra=payload)
+    try:
+        response = _invoke_mcp_tool(mcp_client, "jules_send_message", payload)
+    except Exception as error:  # noqa: BLE001
+        LOGGER.error("MCP invocation failed", extra={"task_id": validated_id})
+        raise RuntimeError("Failed to send message via MCP") from error
+    text_payload = _extract_response_text(response)
+    try:
+        raw_data = json.loads(text_payload)
+    except json.JSONDecodeError as error:
+        raise ValueError("Unable to parse message payload") from error
+    if not isinstance(raw_data, dict):
+        raise ValueError("Message payload must be a dictionary")
+    success_value = raw_data.get("success")
+    if success_value is False:
+        return False
+    if raw_data.get("error"):
+        message_text = str(raw_data.get("error"))
+        raise RuntimeError(f"MCP message send failed: {message_text}")
+    if success_value is None:
+        raise ValueError("Message payload missing success indicator")
+    if success_value is not True:
+        raise ValueError("Unexpected success value in message payload")
+    history = normalized_task.get("chat_history")
+    if history is None:
+        history = []
+        normalized_task["chat_history"] = history
+    history.append(models.create_chat_message("user", validated_message))
+    serialized_task = models.jules_task_to_dict(normalized_task)
+    storage.save_task(storage_manager, serialized_task)
+    return True
+
+
 def _validate_repository(repository: str) -> str:
     if repository is None:
         raise ValueError("Repository is required")

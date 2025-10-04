@@ -322,28 +322,28 @@ This checklist breaks down each ticket into tiny, testable tasks following Test-
 #### JJM-010: Job Manager - Send Message
 **TDD: Write tests for send_message functionality**
 
-- [ ] JJM-010-T01: Write test for `send_message()` method in test_job_manager.py
-- [ ] JJM-010-T02: Write test for sending message with task_id and message
-- [ ] JJM-010-T03: Write test for MCP tool invocation (jules_send_message)
-- [ ] JJM-010-T04: Write test for success response (returns True)
-- [ ] JJM-010-T05: Write test for failure response (returns False)
-- [ ] JJM-010-T06: Write test for storage update with new chat message
-- [ ] JJM-010-T07: Write test for invalid task ID error
-- [ ] JJM-010-T08: Write test for message send failure
-- [ ] JJM-010-T09: Run tests (should fail - Red phase): `pytest tests/test_job_manager.py::test_send_message -v`
-- [ ] JJM-010-T10: Implement `send_message()` method in JobManager
-- [ ] JJM-010-T11: Add parameters: task_id, message
-- [ ] JJM-010-T12: Call mcp_client.invoke_tool("jules_send_message", args)
-- [ ] JJM-010-T13: Parse response for success/failure
-- [ ] JJM-010-T14: If successful, get task from storage
-- [ ] JJM-010-T15: Add new ChatMessage to task.chat_history
-- [ ] JJM-010-T16: Save updated task to storage
-- [ ] JJM-010-T17: Return boolean success status
-- [ ] JJM-010-T18: Add error handling for invalid task ID
-- [ ] JJM-010-T19: Add error handling for send failures
-- [ ] JJM-010-T20: Run tests (should pass - Green phase): `pytest tests/test_job_manager.py::test_send_message -v`
-- [ ] JJM-010-T21: Add docstring to send_message method
-- [ ] JJM-010-T22: Add type hints
+- [x] JJM-010-T01: Write test for `send_message()` method in test_job_manager.py
+- [x] JJM-010-T02: Write test for sending message with task_id and message
+- [x] JJM-010-T03: Write test for MCP tool invocation (jules_send_message)
+- [x] JJM-010-T04: Write test for success response (returns True)
+- [x] JJM-010-T05: Write test for failure response (returns False)
+- [x] JJM-010-T06: Write test for storage update with new chat message
+- [x] JJM-010-T07: Write test for invalid task ID error
+- [x] JJM-010-T08: Write test for message send failure
+- [x] JJM-010-T09: Run tests (should fail - Red phase): `pytest tests/test_job_manager.py::test_send_message -v`
+- [x] JJM-010-T10: Implement `send_message()` method in JobManager
+- [x] JJM-010-T11: Add parameters: task_id, message
+- [x] JJM-010-T12: Call mcp_client.invoke_tool("jules_send_message", args)
+- [x] JJM-010-T13: Parse response for success/failure
+- [x] JJM-010-T14: If successful, get task from storage
+- [x] JJM-010-T15: Add new ChatMessage to task.chat_history
+- [x] JJM-010-T16: Save updated task to storage
+- [x] JJM-010-T17: Return boolean success status
+- [x] JJM-010-T18: Add error handling for invalid task ID
+- [x] JJM-010-T19: Add error handling for send failures
+- [x] JJM-010-T20: Run tests (should pass - Green phase): `pytest tests/test_job_manager.py::test_send_message -v`
+- [x] JJM-010-T21: Add docstring to send_message method
+- [x] JJM-010-T22: Add type hints
 - [ ] JJM-010-T23: Add logging for message operations
 - [ ] JJM-010-T24: Run tests again to verify refactoring
 - [ ] JJM-010-T25: Check code coverage for send_message
