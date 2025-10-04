@@ -448,8 +448,8 @@ This checklist breaks down each ticket into tiny, testable tasks following Test-
 - [x] JJM-013-T25: Add logging for monitoring operations
 - [x] JJM-013-T26: Run tests again to verify refactoring
 - [x] JJM-013-T27: Check code coverage for monitor_task
-- [ ] JJM-013-T28: Commit changes: "JJM-013: Implement monitor_task with tests"
-- [ ] JJM-013-T29: Push to repository
+- [x] JJM-013-T28: Commit changes: "JJM-013: Implement monitor_task with tests"
+- [x] JJM-013-T29: Push to repository
 
 ---
 
